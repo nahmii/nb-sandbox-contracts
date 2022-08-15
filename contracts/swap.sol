@@ -32,4 +32,19 @@ contract TokenSwap is AccessControl {
         cBSToken.mint(msg.sender, amountNok);
         return amountNok;
     }
+
+    function swapNokS(uint256 amountNokS)
+        public
+        onlyRole(SWAP_ROLE)
+        returns (uint256)
+    {
+        require(amountNokS > 0, "amountNok must be greater then zero");
+        require(
+            cBSToken.balanceOf(msg.sender) >= amountNokS,
+            "sender doesn't have enough Tokens"
+        );
+        cBSToken.burn(msg.sender, amountNokS);
+        cbToken.transfer(msg.sender, amountNokS);
+        return amountNokS;
+    }
 }
