@@ -78,7 +78,7 @@ describe("", function () {
     });
 
     it("it should mutate nok to nok-s token", async () => {
-      await swap.swapNok(getTokenValue(10));
+      await swap.swapCbToCbs(getTokenValue(10));
       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
       //   console.log("new tSupply", expected);
       const swapNokBalance = ethers.utils.formatEther(
@@ -99,7 +99,7 @@ describe("", function () {
     });
 
     it("it should mutate nok-s to nok token and burn nok-s", async () => {
-      await swap.swapNokS(getTokenValue(10));
+      await swap.swapCbsToCb(getTokenValue(10));
       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
       const swapNokBalance = ethers.utils.formatEther(
         await cbToken.balanceOf(swap.address)
