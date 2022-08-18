@@ -11,22 +11,22 @@ contract TokenSwap is AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     CBToken public cbToken;
-    CBSToken public cBSToken;
+    CBSToken public cbsToken;
 
-    constructor(address _cBToken, address _cBSToken) {
+    constructor(address _cbToken, address _cbsToken) {
         _grantRole(SWAP_ROLE, msg.sender);
-        cbToken = CBToken(_cBToken);
-        cBSToken = CBSToken(_cBSToken);
+        cbToken = CBToken(_cbToken);
+        cbsToken = CBSToken(_cbsToken);
     }
 
-    function swapNok(uint256 amountNok)
+    function swapNok(uint256 amount)
         public
         onlyRole(SWAP_ROLE)
         returns (uint256)
     {
-        require(amountNok > 0, "amountNok must be greater then zero");
+        require(amount > 0, "amount must be greater then zero");
         require(
-            cbToken.balanceOf(msg.sender) >= amountNok,
+            cbToken.balanceOf(msg.sender) >= amount,
             "sender doesn't have enough Tokens"
         );
         require(
@@ -34,7 +34,7 @@ contract TokenSwap is AccessControl {
             "You are not an admin"
         );
         require(
-            cBSToken.hasRole(MINTER_ROLE, msg.sender),
+            cbsToken.hasRole(MINTER_ROLE, msg.sender),
             "You are not an admin"
         );
         require(
@@ -42,22 +42,22 @@ contract TokenSwap is AccessControl {
             "You are not an admin"
         );
         require(
-            cBSToken.hasRole(BURNER_ROLE, msg.sender),
+            cbsToken.hasRole(BURNER_ROLE, msg.sender),
             "You are not an admin"
         );
-        require(cbToken.transferFrom(msg.sender, address(this), amountNok));
-        cBSToken.mint(msg.sender, amountNok);
-        return amountNok;
+        require(cbToken.transferFrom(msg.sender, address(this), amount));
+        cbsToken.mint(msg.sender, amount);
+        return amount;
     }
 
-    function swapNokS(uint256 amountNokS)
+    function swapNokS(uint256 amount)
         public
         onlyRole(SWAP_ROLE)
         returns (uint256)
     {
-        require(amountNokS > 0, "amountNok must be greater then zero");
+        require(amount > 0, "amount must be greater then zero");
         require(
-            cBSToken.balanceOf(msg.sender) >= amountNokS,
+            cbsToken.balanceOf(msg.sender) >= amount,
             "sender doesn't have enough Tokens"
         );
         require(
@@ -65,7 +65,7 @@ contract TokenSwap is AccessControl {
             "You are not an admin"
         );
         require(
-            cBSToken.hasRole(MINTER_ROLE, msg.sender),
+            cbsToken.hasRole(MINTER_ROLE, msg.sender),
             "You are not an admin"
         );
         require(
@@ -73,11 +73,11 @@ contract TokenSwap is AccessControl {
             "You are not an admin"
         );
         require(
-            cBSToken.hasRole(BURNER_ROLE, msg.sender),
+            cbsToken.hasRole(BURNER_ROLE, msg.sender),
             "You are not an admin"
         );
-        cBSToken.burn(msg.sender, amountNokS);
-        require(cbToken.transfer(msg.sender, amountNokS));
-        return amountNokS;
+        cbsToken.burn(msg.sender, amount);
+        require(cbToken.transfer(msg.sender, amount));
+        return amount;
     }
 }
