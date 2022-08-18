@@ -63,11 +63,11 @@ describe("Disperse", function () {
     });
 
     it("Send approval Disperse contract to withdraw amount and disperse", async () => {
-      const approve = await cbToken.approve(disperse.address, getTotal());
+      await cbToken.approve(disperse.address, getTotal());
     });
 
     it("Should disperse ERC20 transfers by direct transfer to recipient", async () => {
-      const disperseToken = await disperse.disperseToken(
+      await disperse.disperseToken(
         cbToken.address,
         recipients,
         values
