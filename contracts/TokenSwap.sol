@@ -20,30 +20,18 @@ contract TokenSwap is AccessControl {
     }
 
     function swapNok(uint256 amount)
-        public
-        onlyRole(SWAP_ROLE)
-        returns (uint256)
+    public
+    onlyRole(SWAP_ROLE)
+    returns (uint256)
     {
-        require(amount > 0, "Amount must be greater than zero");
+        require(amount > 0, string.concat("Amount of ", cbToken.symbol(), " must be greater than zero"));
         require(
             cbToken.balanceOf(msg.sender) >= amount,
-            "Sender doesn't have enough tokens"
-        );
-        require(
-            cbToken.hasRole(MINTER_ROLE, msg.sender),
-            "You are not an admin"
+            string.concat("Sender does not have enough ", cbToken.symbol())
         );
         require(
             cbsToken.hasRole(MINTER_ROLE, msg.sender),
-            "You are not an admin"
-        );
-        require(
-            cbToken.hasRole(BURNER_ROLE, msg.sender),
-            "You are not an admin"
-        );
-        require(
-            cbsToken.hasRole(BURNER_ROLE, msg.sender),
-            "You are not an admin"
+            string.concat("Sender is not a minter of ", cbsToken.symbol())
         );
         require(cbToken.transferFrom(msg.sender, address(this), amount));
         cbsToken.mint(msg.sender, amount);
@@ -51,30 +39,18 @@ contract TokenSwap is AccessControl {
     }
 
     function swapNokS(uint256 amount)
-        public
-        onlyRole(SWAP_ROLE)
-        returns (uint256)
+    public
+    onlyRole(SWAP_ROLE)
+    returns (uint256)
     {
-        require(amount > 0, "Amount must be greater than zero");
+        require(amount > 0, string.concat("Amount of ", cbsToken.symbol(), " must be greater than zero"));
         require(
             cbsToken.balanceOf(msg.sender) >= amount,
-            "Sender doesn't have enough tokens"
-        );
-        require(
-            cbToken.hasRole(MINTER_ROLE, msg.sender),
-            "You are not an admin"
-        );
-        require(
-            cbsToken.hasRole(MINTER_ROLE, msg.sender),
-            "You are not an admin"
-        );
-        require(
-            cbToken.hasRole(BURNER_ROLE, msg.sender),
-            "You are not an admin"
+            string.concat("Sender does not have enough ", cbsToken.symbol())
         );
         require(
             cbsToken.hasRole(BURNER_ROLE, msg.sender),
-            "You are not an admin"
+            string.concat("Sender is not a burner of ", cbsToken.symbol())
         );
         cbsToken.burn(msg.sender, amount);
         require(cbToken.transfer(msg.sender, amount));
