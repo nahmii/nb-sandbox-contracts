@@ -17,7 +17,7 @@ contract TokenSwap is AccessControl {
         cbsToken = CBSToken(_cbsToken);
     }
 
-    function swapNok(uint256 amount)
+    function swapCbToCbs(uint256 amount)
     public
     onlyRole(SWAP_ROLE)
     returns (uint256)
@@ -36,7 +36,7 @@ contract TokenSwap is AccessControl {
         return amount;
     }
 
-    function swapNokS(uint256 amount)
+    function swapCbsToCb(uint256 amount)
     public
     onlyRole(SWAP_ROLE)
     returns (uint256)
