@@ -7,19 +7,21 @@ import "./CBToken.sol";
 import "./CBSToken.sol";
 
 contract TokenSwap is AccessControl {
-    bytes32 public constant SWAP_ROLE = keccak256("SWAP_ROLE");
+    bytes32 public constant SWAP_CB_TO_CBS_ROLE = keccak256("SWAP_CB_TO_CBS_ROLE");
+    bytes32 public constant SWAP_CBS_TO_CB_ROLE = keccak256("SWAP_CBS_TO_CB_ROLE");
     CBToken public cbToken;
     CBSToken public cbsToken;
 
     constructor(address _cbToken, address _cbsToken) {
-        _grantRole(SWAP_ROLE, msg.sender);
+        _grantRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
+        _grantRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
         cbToken = CBToken(_cbToken);
         cbsToken = CBSToken(_cbsToken);
     }
 
     function swapCbToCbs(uint256 amount)
     public
-    onlyRole(SWAP_ROLE)
+    onlyRole(SWAP_CB_TO_CBS_ROLE)
     returns (uint256)
     {
         require(amount > 0, string.concat("Amount of ", cbToken.symbol(), " must be greater than zero"));
@@ -38,7 +40,7 @@ contract TokenSwap is AccessControl {
 
     function swapCbsToCb(uint256 amount)
     public
-    onlyRole(SWAP_ROLE)
+    onlyRole(SWAP_CBS_TO_CB_ROLE)
     returns (uint256)
     {
         require(amount > 0, string.concat("Amount of ", cbsToken.symbol(), " must be greater than zero"));
