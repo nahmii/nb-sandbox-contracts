@@ -32,4 +32,3 @@ contract CBSToken is ERC20, AccessControl {
         _burn(to, amount);
     }
 }
-`
