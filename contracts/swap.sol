@@ -8,6 +8,8 @@ import "./CBSToken.sol";
 
 contract TokenSwap is AccessControl {
     bytes32 public constant SWAP_ROLE = keccak256("SWAP_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     CBToken public cbToken;
     CBSToken public cBSToken;
 
@@ -27,6 +29,22 @@ contract TokenSwap is AccessControl {
             cbToken.balanceOf(msg.sender) >= amountNok,
             "sender doesn't have enough Tokens"
         );
+        require(
+            cbToken.hasRole(MINTER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cBSToken.hasRole(MINTER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cbToken.hasRole(BURNER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cBSToken.hasRole(BURNER_ROLE, msg.sender),
+            "You are not an admin"
+        );
         require(cbToken.transferFrom(msg.sender, address(this), amountNok));
         cBSToken.mint(msg.sender, amountNok);
         return amountNok;
@@ -41,6 +59,22 @@ contract TokenSwap is AccessControl {
         require(
             cBSToken.balanceOf(msg.sender) >= amountNokS,
             "sender doesn't have enough Tokens"
+        );
+        require(
+            cbToken.hasRole(MINTER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cBSToken.hasRole(MINTER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cbToken.hasRole(BURNER_ROLE, msg.sender),
+            "You are not an admin"
+        );
+        require(
+            cBSToken.hasRole(BURNER_ROLE, msg.sender),
+            "You are not an admin"
         );
         cBSToken.burn(msg.sender, amountNokS);
         require(cbToken.transfer(msg.sender, amountNokS));
