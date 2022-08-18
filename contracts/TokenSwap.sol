@@ -8,8 +8,6 @@ import "./CBSToken.sol";
 
 contract TokenSwap is AccessControl {
     bytes32 public constant SWAP_ROLE = keccak256("SWAP_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     CBToken public cbToken;
     CBSToken public cbsToken;
 
@@ -30,7 +28,7 @@ contract TokenSwap is AccessControl {
             string.concat("Sender does not have enough ", cbToken.symbol())
         );
         require(
-            cbsToken.hasRole(MINTER_ROLE, msg.sender),
+            cbsToken.hasRole(cbsToken.MINTER_ROLE(), msg.sender),
             string.concat("Sender is not a minter of ", cbsToken.symbol())
         );
         require(cbToken.transferFrom(msg.sender, address(this), amount));
@@ -49,7 +47,7 @@ contract TokenSwap is AccessControl {
             string.concat("Sender does not have enough ", cbsToken.symbol())
         );
         require(
-            cbsToken.hasRole(BURNER_ROLE, msg.sender),
+            cbsToken.hasRole(cbsToken.BURNER_ROLE(), msg.sender),
             string.concat("Sender is not a burner of ", cbsToken.symbol())
         );
         cbsToken.burn(msg.sender, amount);
