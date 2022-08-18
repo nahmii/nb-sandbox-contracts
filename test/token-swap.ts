@@ -13,13 +13,13 @@ describe("", function () {
   let cbToken: any;
   let cbsToken: any;
   let CBSToken: any;
-  let Swap: any;
-  let swap: any;
+  let TokenSwap: any;
+  let tokenSwap: any;
   before(async () => {
     signers = await hre.ethers.getSigners();
     CBToken = await ethers.getContractFactory("CBToken");
     CBSToken = await ethers.getContractFactory("CBSToken");
-    Swap = await ethers.getContractFactory("TokenSwap");
+    TokenSwap = await ethers.getContractFactory("TokenSwap");
   });
 
   describe("Deploy CBToken", async () => {
@@ -48,72 +48,72 @@ describe("", function () {
     });
   });
 
-  describe("Swap", async () => {
-    it("Should deploy Swap contract", async () => {
-      swap = await Swap.deploy(cbToken.address, cbsToken.address);
-      await swap.deployed();
-      console.log(swap.address);
+  describe("TokenSwap", async () => {
+    it("Should deploy TokenSwap contract", async () => {
+      tokenSwap = await TokenSwap.deploy(cbToken.address, cbsToken.address);
+      await tokenSwap.deployed();
+      console.log(tokenSwap.address);
     });
 
-    it("approve swap contract to spend an amount of CBToken", async () => {
-      await cbToken.approve(swap.address, getTokenValue(10));
+    it("approve TokenSwap contract to spend an amount of CBToken", async () => {
+      await cbToken.approve(tokenSwap.address, getTokenValue(10));
     });
 
-    it("approve swap contract to spend an amount of CBSToken", async () => {
-      await cbsToken.approve(swap.address, getTokenValue(10));
+    it("approve TokenSwap contract to spend an amount of CBSToken", async () => {
+      await cbsToken.approve(tokenSwap.address, getTokenValue(10));
     });
 
-    it("grant swap contract a minter role to mint CBSToken", async () => {
+    it("grant TokenSwap contract a minter role to mint CBSToken", async () => {
       await cbsToken.grantRole(
         "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",
-        swap.address
+        tokenSwap.address
       );
     });
 
-    it("grant swap contract a burner role to burn CBSToken", async () => {
+    it("grant TokenSwap contract a burner role to burn CBSToken", async () => {
       await cbsToken.grantRole(
         "0x3c11d16cbaffd01df69ce1c404f6340ee057498f5f00246190ea54220576a848",
-        swap.address
+        tokenSwap.address
       );
     });
 
-    it("it should mutate nok to nok-s token", async () => {
-      await swap.swapCbToCbs(getTokenValue(10));
+    it("it should mutate CBToken to CBSToken and mint CBSToken", async () => {
+      await tokenSwap.swapCbToCbs(getTokenValue(10));
       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
       //   console.log("new tSupply", expected);
-      const swapNokBalance = ethers.utils.formatEther(
-        await cbToken.balanceOf(swap.address)
+      const tokenSwapCbTokenBalance = ethers.utils.formatEther(
+        await cbToken.balanceOf(tokenSwap.address)
       );
-      //   console.log("swapNokbalace", swapNokBalance);
+      //   console.log("tokenSwapCbTokenBalance", tokenSwapCbTokenBalance);
 
-      const senderNokSBalance = ethers.utils.formatEther(
+      const senderCbsTokenBalance = ethers.utils.formatEther(
         await cbsToken.balanceOf(signers[0].address)
       );
-      //   console.log("sender", senderNokSBalance);
-      expect(senderNokSBalance).equal(
+      //   console.log("senderCbsTokenBalance", senderCbsTokenBalance);
+      expect(senderCbsTokenBalance).equal(
         ethers.utils.formatEther(getTokenValue(10))
       );
-      expect(swapNokBalance).equal(ethers.utils.formatEther(getTokenValue(10)));
+      expect(tokenSwapCbTokenBalance).equal(ethers.utils.formatEther(getTokenValue(10)));
       //   console.log("token", ethers.utils.formatEther(getTokenValue(10)));
       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(10)));
     });
 
-    it("it should mutate nok-s to nok token and burn nok-s", async () => {
-      await swap.swapCbsToCb(getTokenValue(10));
+    it("it should mutate CBSToken to CBToken and burn CBSToken", async () => {
+      await tokenSwap.swapCbsToCb(getTokenValue(10));
       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
-      const swapNokBalance = ethers.utils.formatEther(
-        await cbToken.balanceOf(swap.address)
+      const tokenSwapCbTokenBalance = ethers.utils.formatEther(
+        await cbToken.balanceOf(tokenSwap.address)
       );
-      const senderNokSBalance = ethers.utils.formatEther(
+      const senderCbsTokenBalance = ethers.utils.formatEther(
         await cbsToken.balanceOf(signers[0].address)
       );
 
       //   console.log("new tSupply", expected);
       //   console.log("token", ethers.utils.formatEther(getTokenValue(10)));
-      expect(senderNokSBalance).equal(
+      expect(senderCbsTokenBalance).equal(
         ethers.utils.formatEther(getTokenValue(0))
       );
-      expect(swapNokBalance).equal(ethers.utils.formatEther(getTokenValue(0)));
+      expect(tokenSwapCbTokenBalance).equal(ethers.utils.formatEther(getTokenValue(0)));
       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(0)));
     });
   });
