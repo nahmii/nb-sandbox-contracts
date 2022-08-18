@@ -24,10 +24,10 @@ contract TokenSwap is AccessControl {
         onlyRole(SWAP_ROLE)
         returns (uint256)
     {
-        require(amount > 0, "amount must be greater then zero");
+        require(amount > 0, "Amount must be greater than zero");
         require(
             cbToken.balanceOf(msg.sender) >= amount,
-            "sender doesn't have enough Tokens"
+            "Sender doesn't have enough tokens"
         );
         require(
             cbToken.hasRole(MINTER_ROLE, msg.sender),
@@ -55,10 +55,10 @@ contract TokenSwap is AccessControl {
         onlyRole(SWAP_ROLE)
         returns (uint256)
     {
-        require(amount > 0, "amount must be greater then zero");
+        require(amount > 0, "Amount must be greater than zero");
         require(
             cbsToken.balanceOf(msg.sender) >= amount,
-            "sender doesn't have enough Tokens"
+            "Sender doesn't have enough tokens"
         );
         require(
             cbToken.hasRole(MINTER_ROLE, msg.sender),
