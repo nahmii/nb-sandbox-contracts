@@ -27,8 +27,7 @@ contract TokenSwap is AccessControl {
             cbToken.balanceOf(msg.sender) >= amountNok,
             "sender doesn't have enough Tokens"
         );
-        cbToken.approve(msg.sender, amountNok);
-        cbToken.transferFrom(msg.sender, address(this), amountNok);
+        require(cbToken.transferFrom(msg.sender, address(this), amountNok));
         cBSToken.mint(msg.sender, amountNok);
         return amountNok;
     }
@@ -44,7 +43,7 @@ contract TokenSwap is AccessControl {
             "sender doesn't have enough Tokens"
         );
         cBSToken.burn(msg.sender, amountNokS);
-        cbToken.transfer(msg.sender, amountNokS);
+        require(cbToken.transfer(msg.sender, amountNokS));
         return amountNokS;
     }
 }
