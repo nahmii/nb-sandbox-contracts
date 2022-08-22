@@ -1,6 +1,8 @@
-# Token contract for the Norges Bank CBDC sandbox
+# Smart contracts for the Norges Bank CBDC sandbox
 
-This repository contains the ERC20 token for the Norges Bank CBDC sandbox.
+## Disclaimer
+
+This a sandbox project and not intended for production; use at your own risk.
 
 ## Advanced Sample Hardhat Project
 
