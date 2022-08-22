@@ -2,10 +2,10 @@
   "name": "nb-sandbox-token",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy_CBToken:testnet": "hardhat run scripts/deploy.ts --network testnet",
-    "deploy_CBToken:mainnet": "hardhat run scripts/deploy.ts --network mainnet",
-    "deploy_disperse:testnet": "hardhat run scripts/disperse.ts --network testnet",
-    "deploy_dispers:mainnet": "hardhat run scripts/disperse.ts --network mainnet",
+    "deploy_CBToken": "hardhat run scripts/deploy.ts --network $NETWORK",
+    "deploy_CBSToken": "hardhat run scripts/deploy-CBSToken.ts --network $NETWORK",
+    "deploy_TokenSwap": "hardhat run scripts/token-swap.ts --network $NETWORK",
+    "deploy_disperse": "hardhat run scripts/disperse.ts --network $NETWORK",
     "test": "hardhat test"
   },
   "devDependencies": {
