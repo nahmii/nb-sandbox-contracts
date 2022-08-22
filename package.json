@@ -1,5 +1,8 @@
 {
-  "name": "nb-sandbox-token",
+  "name": "nb-sandbox-contracts",
+  "author": "Nahmii AS",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
   "scripts": {
     "compile": "hardhat compile",
     "deploy_CBToken": "hardhat run scripts/deploy.ts --network $NETWORK",
