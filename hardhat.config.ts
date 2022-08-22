@@ -26,6 +26,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.16",
   networks: {
     mainnet: {
+      chainId: parseInt(process.env.CHAIN_ID ?? "0"),
       url: process.env.MAINNET_URL || "",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
