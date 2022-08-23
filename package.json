@@ -5,10 +5,10 @@
   "license": "Apache-2.0",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy_CBToken": "hardhat run scripts/deploy-cbtoken.ts --network $NETWORK",
+    "deploy_CBToken": "hardhat run scripts/deploy_CBToken.ts --network $NETWORK",
     "deploy_CBSToken": "hardhat run scripts/deploy_CBSToken.ts --network $NETWORK",
-    "deploy_TokenSwap": "hardhat run scripts/token_swap.ts --network $NETWORK",
-    "deploy_disperse": "hardhat run scripts/deploy-disperse.ts --network $NETWORK",
+    "deploy_TokenSwap": "hardhat run scripts/deploy_TokenSwap.ts --network $NETWORK",
+    "deploy_Disperse": "hardhat run scripts/deploy_Disperse.ts --network $NETWORK",
     "test": "hardhat test"
   },
   "devDependencies": {
