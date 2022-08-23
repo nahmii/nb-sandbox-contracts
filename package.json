@@ -5,10 +5,10 @@
   "license": "Apache-2.0",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy_CBToken": "hardhat run scripts/deploy.ts --network $NETWORK",
+    "deploy_CBToken": "hardhat run scripts/deploy-cbtoken.ts --network $NETWORK",
     "deploy_CBSToken": "hardhat run scripts/deploy_CBSToken.ts --network $NETWORK",
     "deploy_TokenSwap": "hardhat run scripts/token_swap.ts --network $NETWORK",
-    "deploy_disperse": "hardhat run scripts/disperse.ts --network $NETWORK",
+    "deploy_disperse": "hardhat run scripts/deploy-disperse.ts --network $NETWORK",
     "test": "hardhat test"
   },
   "devDependencies": {
@@ -34,6 +34,7 @@
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.6.2",
     "hardhat": "^2.9.2",
+    "hardhat-dependency-compiler": "^1.1.3",
     "hardhat-gas-reporter": "^1.0.8",
     "prettier": "^2.6.1",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
@@ -44,6 +45,7 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.5.0"
+    "@openzeppelin/contracts": "^4.5.0",
+    "token-research": "github:banteg/disperse-research"
   }
 }
