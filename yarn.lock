@@ -668,7 +668,6 @@
   dependencies:
     "@types/sinon-chai" "^3.2.3"
     "@types/web3" "1.0.19"
-
 "@openzeppelin/contracts@^4.5.0":
   "version" "4.5.0"
 
