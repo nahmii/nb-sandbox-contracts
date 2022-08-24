@@ -1,7 +1,7 @@
 {
   "name": "nb-sandbox-token",
   "scripts": {
-    "access": "hardhat run scripts/grant_Access.ts --network $NETWORK",
+    "grant_Access": "hardhat run scripts/grant_Access.ts --network $NETWORK",
     "compile": "hardhat compile",
     "deploy_CBToken": "hardhat run scripts/deploy_CBToken.ts --network $NETWORK",
     "deploy_CBSToken": "hardhat run scripts/deploy_CBSToken.ts --network $NETWORK",
