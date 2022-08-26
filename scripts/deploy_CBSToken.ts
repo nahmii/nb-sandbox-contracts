@@ -14,7 +14,7 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const CBSToken = await ethers.getContractFactory("CBToken");
+  const CBSToken = await ethers.getContractFactory("CBSToken");
   const cBSTtoken = await CBSToken.deploy("CBSToken", "CBST", 4);
 
   await cBSTtoken.deployed();
