@@ -31,8 +31,8 @@ contract TokenSwap is AccessControl {
             string.concat("Sender does not have enough ", cbToken.symbol())
         );
         require(
-            cbsToken.hasRole(cbsToken.MINTER_ROLE(), msg.sender),
-            string.concat("Sender is not a minter of ", cbsToken.symbol())
+            cbsToken.hasRole(cbsToken.MINTER_ROLE(), address(this)),
+            string.concat("TokenSwap is not a minter of ", cbsToken.symbol())
         );
         require(cbToken.transferFrom(msg.sender, address(this), amount));
         cbsToken.mint(msg.sender, amount);
@@ -50,8 +50,8 @@ contract TokenSwap is AccessControl {
             string.concat("Sender does not have enough ", cbsToken.symbol())
         );
         require(
-            cbsToken.hasRole(cbsToken.BURNER_ROLE(), msg.sender),
-            string.concat("Sender is not a burner of ", cbsToken.symbol())
+            cbsToken.hasRole(cbsToken.BURNER_ROLE(), address(this)),
+            string.concat("TokenSwap is not a burner of ", cbsToken.symbol())
         );
         cbsToken.burn(msg.sender, amount);
         require(cbToken.transfer(msg.sender, amount));
