@@ -7,9 +7,11 @@ ERC1400 introduces additional features to ERC20 features, and provides issuers w
 Currently the most common and well-known standard within crypto community is the ERC20([eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20)).
 The vast majority of ICOs are based on this ERC20 standard, but it doesn't appear to be the most relevant standard for financial asset tokenization.
 The only parameters required to perform an ERC20 token transfer are the recipient's address and the value of the transfer, thus limiting the control possibilities over transfers:
+
 ```
 function transfer(address recipient, uint256 value)
 ```
+
 All controls have to be hard-coded on-chain and are often limited to simple/binary checks e.g. checking whether an investor is blacklisted or not.
 
 Codefi Assets makes use of more evolved/granular controls to secure transfers.
@@ -18,19 +20,22 @@ Those controls can evolve quickly and require flexibility, which makes it diffic
 ### Transfer controls based on certificates - A way to perform multisignature in one single transaction
 
 The use of an additional 'data' parameter in the transfer functions can enable more evolved/granular controls:
+
 ```
 function transferWithData(address recipient, uint256 value, bytes data)
 ```
+
 Codefi Assets fosters to use this additional 'data' field, available in the ERC1400 standard, in order to inject a certificate generated off-chain by the issuer.
 A token transfer shall be conditioned to the validity of the certificate, thus offering the issuer with strong control capabilities over its financial assets.
 
 ![Picture5](../../images/Picture5.png)
 
 The Codefi certificate contains:
- - The function ID which ensures the certificate can’t be used on an other function.
- - The parameters which ensures the input parameters have been validated by the issuer.
- - A validity date which ensures the certificate can’t be used after validity date.
- - A nonce which ensures the certificate can’t be used twice.
+
+- The function ID which ensures the certificate can’t be used on an other function.
+- The parameters which ensures the input parameters have been validated by the issuer.
+- A validity date which ensures the certificate can’t be used after validity date.
+- A nonce which ensures the certificate can’t be used twice.
 
 Finally the certificate is signed by the issuer which ensures it is authentic.
 
@@ -39,19 +44,19 @@ The certificate enables the issuer to perform advanced conditional ownership, si
 ![Picture6](../../images/Picture6.png)
 
 In a way, this can be seen as a way to perform multisignature in one single transaction since every asset transfer requires:
- - A valid transaction signature (signed by the investor)
- - A valid certificate signature (signed by the issuer)
 
- ### Example use case
- 
- An example use case for the certificate validation is KYC verification.
+- A valid transaction signature (signed by the investor)
+- A valid certificate signature (signed by the issuer)
 
- The certificate generator can be coupled to a KYC API, and only provide certificates to users who've completed their KYC verification before.
+### Example use case
 
- ![Picture7](../../images/Picture7.png)
+An example use case for the certificate validation is KYC verification.
+
+The certificate generator can be coupled to a KYC API, and only provide certificates to users who've completed their KYC verification before.
+
+![Picture7](../../images/Picture7.png)
 
 PS: Since the ERC1400 standard is agnostic about the way to control certificate, we didn't include our certificate controller in this repository (a mock is used instead). In order to perform real advanced conditional ownership, a certificate controller called 'CertificateController.sol' shall be placed in folder '/contracts/CertificateController' instead of the mock placed there.
-
 
 ## Description of certificate controllers and implementation choice (nonce vs salt)
 
@@ -67,17 +72,19 @@ In a way, it can be seen as a way to perform multi-signature, with one single tr
 ### How to use the certificate controller?
 
 The smart contract which requires to verify certificates needs to:
- - Inherit from the certificate controller
- - Add a `data` parameter in final position for the functions which require a certificate validation
- - Add a modifier `isValidCertificate(data)` to the functions which require a certificate validation
+
+- Inherit from the certificate controller
+- Add a `data` parameter in final position for the functions which require a certificate validation
+- Add a modifier `isValidCertificate(data)` to the functions which require a certificate validation
 
 An off-chain certificate generator module is of course required to create the certificates (it is not part of this repo).
 
 ### Nonce-based VS Salt based certificate controllers
 
 There are 2 ways to ensure a certificate can't be used twice:
- - Either introduce a local nonce for each user which is incremented by 1 every time a certificate is used
- - Either introduce a salt generated randomly which is stored in mapping every time a certificate is used
+
+- Either introduce a local nonce for each user which is incremented by 1 every time a certificate is used
+- Either introduce a salt generated randomly which is stored in mapping every time a certificate is used
 
 The advantage of the nonce-based certificate, is it enables the issuer to control the order in which the transactions can be validated by the network.
 But this advantage can also be a problem, in the case when the issuer generates a batch of certificates for the investor without knowing the order they will be sent to the network. In this specific case of certificate batches, it is more relevant to use the salt based certificate.
@@ -93,6 +100,7 @@ The way this is implemented assumes standard ABI encoding of parameters, but the
 The following code is from `CertificateControllerNonce`, but similar logic applies to `CertificateControllerSalt`:
 
 **code2/contracts/CertificateControllerNonce.sol:L127-L134**
+
 ```solidity
 bytes memory payload;
 
@@ -119,4 +127,3 @@ If the signer accepts raw arguments and does its own ABI encoding with standard 
 ### Remediation
 
 This potential vulnerability can be addressed at the signing layer (off chain) by doing the ABI encoding there and denying an attacker the opportunity to construct their own call data.
-
