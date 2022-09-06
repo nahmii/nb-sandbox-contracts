@@ -39,7 +39,7 @@ describe("", function () {
     it("Should deploy and total balance should be 0", async () => {
       cbsToken = await CBSToken.deploy("CBToken", "CBToken", 18);
       await cbsToken.deployed();
-
+      console.log("signer", signers[0].address);
       let balance = await cbsToken.balanceOf(signers[0].address);
       balance = ethers.utils.formatEther(balance);
       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
@@ -52,15 +52,11 @@ describe("", function () {
     it("Should deploy TokenSwap contract", async () => {
       tokenSwap = await TokenSwap.deploy(cbToken.address, cbsToken.address);
       await tokenSwap.deployed();
-      console.log(tokenSwap.address);
+      // console.log(tokenSwap.address);
     });
 
     it("approve TokenSwap contract to spend an amount of CBToken", async () => {
       await cbToken.approve(tokenSwap.address, getTokenValue(10));
-    });
-
-    it("approve TokenSwap contract to spend an amount of CBSToken", async () => {
-      await cbsToken.approve(tokenSwap.address, getTokenValue(10));
     });
 
     it("grant TokenSwap contract a minter role to mint CBSToken", async () => {
@@ -93,7 +89,9 @@ describe("", function () {
       expect(senderCbsTokenBalance).equal(
         ethers.utils.formatEther(getTokenValue(10))
       );
-      expect(tokenSwapCbTokenBalance).equal(ethers.utils.formatEther(getTokenValue(10)));
+      expect(tokenSwapCbTokenBalance).equal(
+        ethers.utils.formatEther(getTokenValue(10))
+      );
       //   console.log("token", ethers.utils.formatEther(getTokenValue(10)));
       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(10)));
     });
@@ -113,7 +111,9 @@ describe("", function () {
       expect(senderCbsTokenBalance).equal(
         ethers.utils.formatEther(getTokenValue(0))
       );
-      expect(tokenSwapCbTokenBalance).equal(ethers.utils.formatEther(getTokenValue(0)));
+      expect(tokenSwapCbTokenBalance).equal(
+        ethers.utils.formatEther(getTokenValue(0))
+      );
       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(0)));
     });
   });
