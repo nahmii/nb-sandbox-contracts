@@ -5,6 +5,11 @@
   "license": "Apache-2.0",
   "scripts": {
     "grant_Access": "hardhat run scripts/grant_Access.ts --network $NETWORK",
+    "add_ERC1400_Minter": "hardhat run scripts/add_ERC1400_Minter.ts --network $NETWORK",
+    "add_ERC1400_Operator": "hardhat run scripts/add_ERC1400_Operator.ts --network $NETWORK",
+    "issue_ERC1400": "hardhat run scripts/issue_ERC1400.ts --network $NETWORK",
+    "operator_Redeem_ERC1400": "hardhat run scripts/operator_Redeem_ERC1400.ts --network $NETWORK",
+    "deploy_ERC1400": "hardhat run scripts/deploy_ERC1400.ts --network $NETWORK",
     "compile": "hardhat compile",
     "deploy_CBToken": "hardhat run scripts/deploy_CBToken.ts --network $NETWORK",
     "deploy_CBSToken": "hardhat run scripts/deploy_CBSToken.ts --network $NETWORK",
