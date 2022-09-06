@@ -3,8 +3,12 @@ import { ethers } from "hardhat";
 async function main() {
   const TokenSwap = await ethers.getContractFactory("TokenSwap");
   const cBTokenAddress = `${process.env.CB_TOKEN_ADDRESS}`;
-  const cBSTokenAddress = `${process.env.CBS_TOKEN_ADDRESS}`;
-  const tokenSwap = await TokenSwap.deploy(cBTokenAddress, cBSTokenAddress);
+  // const cBSTokenAddress = `${process.env.CBS_TOKEN_ADDRESS}`;
+  const erc1400ContractAddress = `${process.env.ERC1400_TOKEN_ADDRESS}`;
+  const tokenSwap = await TokenSwap.deploy(
+    cBTokenAddress,
+    erc1400ContractAddress
+  );
 
   await tokenSwap.deployed();
 
