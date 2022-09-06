@@ -5,56 +5,55 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./CBToken.sol";
 import "./CBSToken.sol";
+import "./ERC1400.sol";
+import "hardhat/console.sol";
 
 contract TokenSwap is AccessControl {
     bytes32 public constant SWAP_CB_TO_CBS_ROLE = keccak256("SWAP_CB_TO_CBS_ROLE");
     bytes32 public constant SWAP_CBS_TO_CB_ROLE = keccak256("SWAP_CBS_TO_CB_ROLE");
     CBToken public cbToken;
     CBSToken public cbsToken;
+    ERC1400 public erc1400Token;
 
-    constructor(address _cbToken, address _cbsToken) {
+    constructor(address _cbToken, address _erc1400Token) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
         _grantRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
         cbToken = CBToken(_cbToken);
-        cbsToken = CBSToken(_cbsToken);
+       erc1400Token = ERC1400(_erc1400Token);
     }
 
-    function swapCbToCbs(uint256 amount)
+    function swapCbToCbs(bytes32 partition, address tokenHolder, uint256 value, bytes calldata data)
     public
     onlyRole(SWAP_CB_TO_CBS_ROLE)
     returns (uint256)
     {
-        require(amount > 0, string.concat("Amount of ", cbToken.symbol(), " must be greater than zero"));
+        require(value > 0, string.concat("Amount of ", cbToken.symbol(), "must be greater than zero"));
         require(
-            cbToken.balanceOf(msg.sender) >= amount,
+            cbToken.balanceOf(msg.sender) >= value,
             string.concat("Sender does not have enough ", cbToken.symbol())
         );
         require(
-            cbsToken.hasRole(cbsToken.MINTER_ROLE(), address(this)),
-            string.concat("TokenSwap is not a minter of ", cbsToken.symbol())
+            erc1400Token.isMinter(address(this)),
+            "TokenSwap is not a minter of CBSToken"
         );
-        require(cbToken.transferFrom(msg.sender, address(this), amount));
-        cbsToken.mint(msg.sender, amount);
-        return amount;
+        require(cbToken.transferFrom(msg.sender, address(this), value), "CBToken Transfer failed");
+        erc1400Token.issueByPartition(partition, msg.sender, value, data);
+        return value;
     }
 
-    function swapCbsToCb(uint256 amount)
+    function swapCbsToCb(bytes32 partition, uint256 value, bytes calldata operatorData)
     public
     onlyRole(SWAP_CBS_TO_CB_ROLE)
     returns (uint256)
     {
-        require(amount > 0, string.concat("Amount of ", cbsToken.symbol(), " must be greater than zero"));
+        require(value > 0, "Amount of CBSToken must be greater than zero");
         require(
-            cbsToken.balanceOf(msg.sender) >= amount,
-            string.concat("Sender does not have enough ", cbsToken.symbol())
+            cbToken.balanceOf(address(this)) >= value,
+            string.concat("Contract does not have enough ", cbToken.symbol())
         );
-        require(
-            cbsToken.hasRole(cbsToken.BURNER_ROLE(), address(this)),
-            string.concat("TokenSwap is not a burner of ", cbsToken.symbol())
-        );
-        cbsToken.burn(msg.sender, amount);
-        require(cbToken.transfer(msg.sender, amount));
-        return amount;
+        erc1400Token.operatorRedeemByPartition(partition, msg.sender, value, operatorData);
+        require(cbToken.transfer(msg.sender, value));
+        return value;
     }
 }
