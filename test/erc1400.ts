@@ -33,7 +33,8 @@ describe("Deploy ERC1400", function () {
         "CBST",
         1,
         [controller],
-        partitions
+        partitions,
+        1337
       );
       await erc1400.deployed();
       console.log("ERC1400 deployed to:", erc1400.address);
