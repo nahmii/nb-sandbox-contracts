@@ -194,10 +194,6 @@ contract ERC1400 is IERC20, IERC1400, Ownable, ERC1820Client, ERC1820Implementer
     _isControllable = true;
     _isIssuable = true;
 
-    // Register contract in ERC1820 registry
-    ERC1820Client.setInterfaceImplementation(ERC1400_INTERFACE_NAME, address(this));
-    ERC1820Client.setInterfaceImplementation(ERC20_INTERFACE_NAME, address(this));
-
     // Indicate token verifies ERC1400 and ERC20 interfaces
     ERC1820Implementer._setInterface(ERC1400_INTERFACE_NAME); // For migration
     ERC1820Implementer._setInterface(ERC20_INTERFACE_NAME); // For migration
