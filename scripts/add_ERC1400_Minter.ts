@@ -1,14 +1,7 @@
-import { expect } from "chai";
 import { ethers } from "hardhat";
-const hre = require("hardhat");
-
-const { BigNumber } = require("@ethersproject/bignumber");
-
-const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
-const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
 
 async function main() {
-  const erc1400ContractAddress = `${process.env.ERC1400_TOKEN_ADDRESS}`;
+  const erc1400ContractAddress = `${process.env.CBS_TOKEN_ADDRESS}`;
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
 
   const contract = await ethers.getContractAt(
