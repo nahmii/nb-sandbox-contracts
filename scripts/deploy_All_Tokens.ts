@@ -1,6 +1,14 @@
 import { ethers } from "hardhat";
 
 async function main() {
+  // ========DEPLOY CB TOKEN============
+  const CBToken = await ethers.getContractFactory("CBToken");
+  const cbToken = await CBToken.deploy("CBToken", "CBT", 18);
+
+  await cbToken.deployed();
+  console.log("CBToken deployed to:", cbToken.address);
+
+  // ========DEPLOY CBS TOKEN============
   const ERC1400 = await ethers.getContractFactory("ERC1400");
   const controller = `${process.env.CONTROLLER}`;
   const partition1 =
@@ -22,8 +30,16 @@ async function main() {
   );
 
   await erc1400.deployed();
+  console.log("CBSToken deployed to:", erc1400.address);
 
-  console.log("Token deployed to:", erc1400.address);
+  // ========DEPLOY TOKENSWAP ============
+  const TokenSwap = await ethers.getContractFactory("TokenSwap");
+  const cBTokenAddress = cbToken.address;
+  const cBSTokenAddress = cbToken.address;
+  const tokenSwap = await TokenSwap.deploy(cBTokenAddress, cBSTokenAddress);
+
+  await tokenSwap.deployed();
+  console.log("TokenSwap deployed to:", tokenSwap.address);
 }
 
 main().catch((error) => {
