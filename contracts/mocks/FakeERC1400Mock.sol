@@ -32,11 +32,12 @@ contract FakeERC1400Mock is ERC1400 {
     uint256 granularity,
     address[] memory controllers,
     bytes32[] memory defaultPartitions,
+    uint256 chainID,
     address extension,
     address mockAddress
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions)
+    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       ExtensionMock(extension).addCertificateSigner(address(this), mockAddress);

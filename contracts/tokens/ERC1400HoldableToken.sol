@@ -48,10 +48,11 @@ contract ERC1400HoldableToken is ERC1400, IExtensionTypes {
     address[] memory controllers,
     bytes32[] memory defaultPartitions,
     address extension,
-    address newOwner
+    address newOwner,
+    uint256 chainID
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions)
+    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       Extension(extension).registerTokenSetup(

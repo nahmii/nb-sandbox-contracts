@@ -66,13 +66,14 @@ contract ERC1400HoldableCertificateToken is ERC1400, IExtensionTypes {
     uint256 granularity,
     address[] memory controllers,
     bytes32[] memory defaultPartitions,
+    uint256 chainID,
     address extension,
     address newOwner,
     address certificateSigner,
     CertificateValidation certificateActivated
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions)
+    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       Extension(extension).registerTokenSetup(

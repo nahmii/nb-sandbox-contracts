@@ -10,13 +10,15 @@ async function main() {
   const partition3 =
     "0x6c6f636b65640000000000000000000000000000000000000000000000000000"; // locked in hex
   const partitions = [partition1, partition2, partition3];
+  const chainID = `${process.env.CHAIN_ID}`;
 
   const erc1400 = await ERC1400.deploy(
     "CBSToken",
     "CBST",
     1,
     [controller],
-    partitions
+    partitions,
+    chainID
   );
 
   await erc1400.deployed();

@@ -10,9 +10,11 @@ abstract contract DomainAware {
     // to not recalculate the domain separator on every call, while still
     // automatically detecting ChainID changes.
     mapping(uint256 => bytes32) private domainSeparators;
+    uint256 private __chainID;
 
-    constructor() {
+    constructor(uint256 _chainid) {
         _updateDomainSeparator();
+        __chainID = _chainid;
     }
 
     function domainName() public virtual view returns (string memory);
@@ -64,11 +66,6 @@ abstract contract DomainAware {
     }
 
     function _chainID() internal view returns (uint256) {
-        uint256 chainID;
-        assembly {
-            chainID := chainid()
-        }
-
-        return chainID;
+        return __chainID;
     }
 }
