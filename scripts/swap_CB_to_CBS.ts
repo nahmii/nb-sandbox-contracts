@@ -1,6 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
+  const signer = (await ethers.getSigners())[0];
   const CBTAddress = `${process.env.CB_TOKEN_ADDRESS}`;
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
   const tokenSwapContract = await ethers.getContractAt(
@@ -10,9 +11,27 @@ async function main() {
 
   const cBTokenContract = await ethers.getContractAt("CBToken", CBTAddress);
 
-  const approve = await cBTokenContract.approve(tokenSwapAddress, 30);
+  const value = 30;
+  const approve = await cBTokenContract.approve(tokenSwapAddress, value);
 
   await approve.wait();
+  console.log(
+    "Approved ",
+    value,
+    "for",
+    tokenSwapAddress,
+    "on",
+    cBTokenContract.address
+  );
+  console.log(
+    tokenSwapAddress,
+    "allowance for",
+    signer.address,
+    "on",
+    cBTokenContract.address,
+    ": ",
+    await cBTokenContract.allowance(signer.address, tokenSwapAddress)
+  );
   const partition1 =
     "0x7265736572766564000000000000000000000000000000000000000000000000"; // reserved in hex
   const partition2 =
@@ -27,7 +46,7 @@ async function main() {
   const swap = await tokenSwapContract.swapCbToCbs(
     partition1,
     tokenHolder,
-    30,
+    value,
     ZERO_BYTES32
   );
 

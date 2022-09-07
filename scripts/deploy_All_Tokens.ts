@@ -9,7 +9,7 @@ async function main() {
   console.log("CBToken deployed to:", cbToken.address);
 
   // ========DEPLOY CBS TOKEN============
-  const ERC1400 = await ethers.getContractFactory("ERC1400");
+  const cBSToken = await ethers.getContractFactory("ERC1400");
   const controller = `${process.env.CONTROLLER}`;
   const partition1 =
     "0x7265736572766564000000000000000000000000000000000000000000000000"; // reserved in hex
@@ -20,7 +20,7 @@ async function main() {
   const partitions = [partition1, partition2, partition3];
   const chainID = `${process.env.CHAIN_ID}`;
 
-  const erc1400 = await ERC1400.deploy(
+  const cbsToken = await cBSToken.deploy(
     "CBSToken",
     "CBST",
     1,
@@ -29,13 +29,13 @@ async function main() {
     chainID
   );
 
-  await erc1400.deployed();
-  console.log("CBSToken deployed to:", erc1400.address);
+  await cbsToken.deployed();
+  console.log("CBSToken deployed to:", cbsToken.address);
 
   // ========DEPLOY TOKENSWAP ============
   const TokenSwap = await ethers.getContractFactory("TokenSwap");
   const cBTokenAddress = cbToken.address;
-  const cBSTokenAddress = cbToken.address;
+  const cBSTokenAddress = cbsToken.address;
   const tokenSwap = await TokenSwap.deploy(cBTokenAddress, cBSTokenAddress);
 
   await tokenSwap.deployed();
