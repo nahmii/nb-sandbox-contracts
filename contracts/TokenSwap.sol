@@ -38,11 +38,11 @@ contract TokenSwap is AccessControl {
             "TokenSwap is not a minter of CBSToken"
         );
         require(cbToken.transferFrom(msg.sender, address(this), value), "CBToken Transfer failed");
-        erc1400Token.issueByPartition(partition, msg.sender, value, data);
+        erc1400Token.issueByPartition(partition, tokenHolder, value, data);
         return value;
     }
 
-    function swapCbsToCb(bytes32 partition, uint256 value, bytes calldata operatorData)
+    function swapCbsToCb(bytes32 partition, address tokenHolder, uint256 value, bytes calldata operatorData)
     public
     onlyRole(SWAP_CBS_TO_CB_ROLE)
     returns (uint256)
@@ -52,7 +52,7 @@ contract TokenSwap is AccessControl {
             cbToken.balanceOf(address(this)) >= value,
             string.concat("Contract does not have enough ", cbToken.symbol())
         );
-        erc1400Token.operatorRedeemByPartition(partition, msg.sender, value, operatorData);
+        erc1400Token.operatorRedeemByPartition(partition, tokenHolder, value, operatorData);
         require(cbToken.transfer(msg.sender, value));
         return value;
     }
