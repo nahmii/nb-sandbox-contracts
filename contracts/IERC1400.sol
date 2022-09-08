@@ -142,3 +142,4 @@ interface IERC1400 is IERC20, IERC1643 {
  *
  * These codes are being discussed at: https://ethereum-magicians.org/t/erc-1066-ethereum-status-codes-esc/283/24
  */
+ 
