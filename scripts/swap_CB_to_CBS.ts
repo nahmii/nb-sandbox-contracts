@@ -9,7 +9,7 @@ async function main() {
   const signer = (await ethers.getSigners())[0];
   const CBTAddress = `${process.env.CB_TOKEN_ADDRESS}`;
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
-  const partition = `${process.env.PARTITION}`;
+  const partition = `${process.env.ISSUE_PARTITION}`;
   const zeroBytes = `${process.env.ZERO_BYTES32}`;
   const tokenHolder = `${process.env.TOKEN_HOLDER}`;
   const value = getTokenValue(50);

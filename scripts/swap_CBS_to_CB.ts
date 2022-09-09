@@ -11,7 +11,7 @@ async function main() {
     "TokenSwap",
     tokenSwapAddress
   );
-  const partition = `${process.env.PARTITION}`;
+  const partition = `${process.env.ISSUE_PARTITION}`;
   const operatorData = `${process.env.OPERATOR_DATA}`;
   const tokenHolder = `${process.env.TOKEN_HOLDER}`;
   const value = getTokenValue(50);

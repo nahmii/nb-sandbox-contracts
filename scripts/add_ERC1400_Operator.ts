@@ -5,7 +5,7 @@ const hre = require("hardhat");
 async function main() {
   const erc1400ContractAddress = `${process.env.CBS_TOKEN_ADDRESS}`;
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
-  const partition = `${process.env.PARTITION}`;
+  const partition = `${process.env.ISSUE_PARTITION}`;
 
   const tokenHolder = `${process.env.TOKEN_HOLDER}`;
 
