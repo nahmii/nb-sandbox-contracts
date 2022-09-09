@@ -1,9 +1,19 @@
 import { ethers } from "hardhat";
 
+const { BigNumber } = require("@ethersproject/bignumber");
+
+const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
+const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
+
 async function main() {
   const signer = (await ethers.getSigners())[0];
   const CBTAddress = `${process.env.CB_TOKEN_ADDRESS}`;
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
+  const partition = `${process.env.PARTITION}`;
+  const zeroBytes = `${process.env.ZERO_BYTES32}`;
+  const tokenHolder = `${process.env.TOKEN_HOLDER}`;
+  const value = getTokenValue(50);
+
   const tokenSwapContract = await ethers.getContractAt(
     "TokenSwap",
     tokenSwapAddress
@@ -11,7 +21,6 @@ async function main() {
 
   const cBTokenContract = await ethers.getContractAt("CBToken", CBTAddress);
 
-  const value = 500;
   const approve = await cBTokenContract.approve(tokenSwapAddress, value);
 
   await approve.wait();
@@ -32,16 +41,12 @@ async function main() {
     ": ",
     await cBTokenContract.allowance(signer.address, tokenSwapAddress)
   );
-  const partition1 =
-    "0x7265736572766564000000000000000000000000000000000000000000000000"; // ""reserved" in hex
-  const ZERO_BYTES32 =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-  const tokenHolder = `${process.env.TOKEN_HOLDER}`;
+
   const swap = await tokenSwapContract.swapCbToCbs(
-    partition1,
+    partition,
     tokenHolder,
     value,
-    ZERO_BYTES32
+    zeroBytes
   );
 
   await swap.wait();

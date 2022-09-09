@@ -1,23 +1,26 @@
 import { ethers } from "hardhat";
 
+const { BigNumber } = require("@ethersproject/bignumber");
+
+const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
+const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
+
 async function main() {
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
   const tokenSwapContract = await ethers.getContractAt(
     "TokenSwap",
     tokenSwapAddress
   );
-
-  const partition1 =
-    "0x7265736572766564000000000000000000000000000000000000000000000000"; // "reserved" in hex
-  const DATA =
-    "0x1100000000000000000000000000000000000000000000000000000000000000";
+  const partition = `${process.env.PARTITION}`;
+  const operatorData = `${process.env.OPERATOR_DATA}`;
   const tokenHolder = `${process.env.TOKEN_HOLDER}`;
+  const value = getTokenValue(50);
 
   const redeem = await tokenSwapContract.swapCbsToCb(
-    partition1,
+    partition,
     tokenHolder,
-    10,
-    DATA
+    value,
+    operatorData
   );
 
   await redeem.wait();
