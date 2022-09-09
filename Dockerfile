@@ -5,12 +5,6 @@ RUN apk add --no-cache python3 make g++
 
 COPY package*.json ./
 RUN npm install
-
-# COPY test/* test/
-# COPY scripts/* scripts/
-# COPY contracts/* contracts/
-# COPY tsconfig.json .
-# COPY hardhat.config.ts .
 COPY . . 
 
 RUN npm run compile
