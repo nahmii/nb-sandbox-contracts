@@ -1,120 +1,82 @@
-// import { expect } from "chai";
-// import { ethers } from "hardhat";
-// const hre = require("hardhat");
+import {expect} from "chai";
+import {ethers} from "hardhat";
 
-// const { BigNumber } = require("@ethersproject/bignumber");
+const hre = require("hardhat");
 
-// const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
-// const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
+const PARTITION_1 = "0x7265736572766564000000000000000000000000000000000000000000000000"; // "reserved" in hex
+const PARTITION_2 = "0x6973737565640000000000000000000000000000000000000000000000000000"; // "issued" in hex
+const PARTITION_3 = "0x6c6f636b65640000000000000000000000000000000000000000000000000000"; // "locked" in hex
+const defaultPartitions = [PARTITION_1, PARTITION_2, PARTITION_3];
 
-// describe("", function () {
-//   let signers: any;
-//   let CBToken: any;
-//   let cbToken: any;
-//   let cbsToken: any;
-//   let CBSToken: any;
-//   let TokenSwap: any;
-//   let tokenSwap: any;
-//   before(async () => {
-//     signers = await hre.ethers.getSigners();
-//     CBToken = await ethers.getContractFactory("CBToken");
-//     CBSToken = await ethers.getContractFactory("CBSToken");
-//     TokenSwap = await ethers.getContractFactory("TokenSwap");
-//   });
+const DECIMALS = 4;
 
-//   describe("Deploy CBToken", async () => {
-//     it("Should deploy and mint 1000000  CBToken", async () => {
-//       cbToken = await CBToken.deploy("CBToken", "CBToken", 18);
-//       await cbToken.deployed();
+describe.skip("TokenSwap", function () {
+    let provider: any;
+    let signer: any;
+    let CBToken: any;
+    let cbToken: any;
+    let cbsToken: any;
+    let CBSToken: any;
+    let TokenSwap: any;
+    let tokenSwap: any;
 
-//       let balance = await cbToken.balanceOf(signers[0].address);
-//       balance = ethers.utils.formatEther(balance);
-//       const expected = ethers.utils.formatEther(await cbToken.totalSupply());
-//       console.log("total supply", expected);
-//       expect(balance).to.equal(expected);
-//     });
-//   });
+    let value = ethers.utils.parseUnits('10', DECIMALS);
+    let cbTokenTotalSupply: any;
 
-//   describe("Deploy CBSToken", async () => {
-//     it("Should deploy and total balance should be 0", async () => {
-//       cbsToken = await CBSToken.deploy("CBToken", "CBToken", 18);
-//       await cbsToken.deployed();
-//       console.log("signer", signers[0].address);
-//       let balance = await cbsToken.balanceOf(signers[0].address);
-//       balance = ethers.utils.formatEther(balance);
-//       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
-//       console.log("nok token total supply", expected);
-//       expect(balance).to.equal(expected);
-//     });
-//   });
+    before(async () => {
+        provider = hre.ethers.provider;
+        signer = (await hre.ethers.getSigners())[0];
+        CBToken = await ethers.getContractFactory("CBToken");
+        CBSToken = await ethers.getContractFactory("ERC1400");
+        TokenSwap = await ethers.getContractFactory("TokenSwap");
 
-//   describe("TokenSwap", async () => {
-//     it("Should deploy TokenSwap contract", async () => {
-//       tokenSwap = await TokenSwap.deploy(cbToken.address, cbsToken.address);
-//       await tokenSwap.deployed();
-//       // console.log(tokenSwap.address);
-//     });
+        cbToken = await CBToken.deploy("CBToken", "CBT", DECIMALS);
+        await cbToken.deployed();
 
-//     it("approve TokenSwap contract to spend an amount of CBToken", async () => {
-//       await cbToken.approve(tokenSwap.address, getTokenValue(10));
-//     });
+        const {chainId} = await provider.getNetwork();
+        cbsToken = await CBSToken.deploy("CBSToken", "CBST", DECIMALS, [signer.address], defaultPartitions, chainId);
+        await cbsToken.deployed();
 
-//     it("grant TokenSwap contract a minter role to mint CBSToken", async () => {
-//       await cbsToken.grantRole(
-//         "0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6",
-//         tokenSwap.address
-//       );
-//     });
+        cbTokenTotalSupply = await cbToken.totalSupply();
+        console.log("CB token total supply", ethers.utils.formatUnits(cbTokenTotalSupply, DECIMALS));
+        expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply);
 
-//     it("grant TokenSwap contract a burner role to burn CBSToken", async () => {
-//       await cbsToken.grantRole(
-//         "0x3c11d16cbaffd01df69ce1c404f6340ee057498f5f00246190ea54220576a848",
-//         tokenSwap.address
-//       );
-//     });
+        const cbsTokenTotalSupply = await cbsToken.totalSupply();
+        console.log("CBS token total supply", ethers.utils.formatUnits(cbsTokenTotalSupply, DECIMALS));
+        expect(cbsTokenTotalSupply).to.equal(ethers.constants.Zero)
+        expect(await cbsToken.balanceOf(signer.address)).to.equal(ethers.constants.Zero);
+    });
 
-//     it("it should mutate CBToken to CBSToken and mint CBSToken", async () => {
-//       await tokenSwap.swapCbToCbs(getTokenValue(10));
-//       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
-//       //   console.log("new tSupply", expected);
-//       const tokenSwapCbTokenBalance = ethers.utils.formatEther(
-//         await cbToken.balanceOf(tokenSwap.address)
-//       );
-//       //   console.log("tokenSwapCbTokenBalance", tokenSwapCbTokenBalance);
+    it("Should deploy TokenSwap contract", async () => {
+        tokenSwap = await TokenSwap.deploy(cbToken.address, cbsToken.address);
+        await tokenSwap.deployed();
+    });
 
-//       const senderCbsTokenBalance = ethers.utils.formatEther(
-//         await cbsToken.balanceOf(signers[0].address)
-//       );
-//       //   console.log("senderCbsTokenBalance", senderCbsTokenBalance);
-//       expect(senderCbsTokenBalance).equal(
-//         ethers.utils.formatEther(getTokenValue(10))
-//       );
-//       expect(tokenSwapCbTokenBalance).equal(
-//         ethers.utils.formatEther(getTokenValue(10))
-//       );
-//       //   console.log("token", ethers.utils.formatEther(getTokenValue(10)));
-//       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(10)));
-//     });
+    it("Should approve TokenSwap contract to spend an amount of CBToken", async () => {
+        await cbToken.approve(tokenSwap.address, value);
+    });
 
-//     it("it should mutate CBSToken to CBToken and burn CBSToken", async () => {
-//       await tokenSwap.swapCbsToCb(getTokenValue(10));
-//       const expected = ethers.utils.formatEther(await cbsToken.totalSupply());
-//       const tokenSwapCbTokenBalance = ethers.utils.formatEther(
-//         await cbToken.balanceOf(tokenSwap.address)
-//       );
-//       const senderCbsTokenBalance = ethers.utils.formatEther(
-//         await cbsToken.balanceOf(signers[0].address)
-//       );
+    it("Should grant TokenSwap contract a minter role to mint/issue CBSToken", async () => {
+        await cbsToken.addMinter(tokenSwap.address);
+    });
 
-//       //   console.log("new tSupply", expected);
-//       //   console.log("token", ethers.utils.formatEther(getTokenValue(10)));
-//       expect(senderCbsTokenBalance).equal(
-//         ethers.utils.formatEther(getTokenValue(0))
-//       );
-//       expect(tokenSwapCbTokenBalance).equal(
-//         ethers.utils.formatEther(getTokenValue(0))
-//       );
-//       expect(expected).to.equal(ethers.utils.formatEther(getTokenValue(0)));
-//     });
-//   });
-// });
+    it("Should set TokenSwap contract as controller of CBSToken", async () => {
+        await cbsToken.authorizeOperatorByPartition(PARTITION_2, tokenSwap.address);
+    });
+
+    it("Should transfer CB tokens to the swap contract and issue CBS tokens", async () => {
+        await tokenSwap.swapCbToCbs(PARTITION_2, value, ethers.constants.HashZero);
+
+        expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply.sub(value));
+        expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(value);
+        expect(await cbsToken.balanceOf(signer.address)).to.equal(value);
+    });
+
+    it("Should redeem CBS tokens and transfer CB tokens to msg.sender", async () => {
+        await tokenSwap.swapCbsToCb(PARTITION_2, value, ethers.constants.HashZero);
+
+        expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply);
+        expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(ethers.constants.Zero);
+        expect(await cbsToken.balanceOf(signer.address)).to.equal(ethers.constants.Zero);
+    });
+});
