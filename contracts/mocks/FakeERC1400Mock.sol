@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import "../ERC1400.sol";
+import "../CBSToken.sol";
 
 /**
  * @notice Interface to the extension contract
@@ -24,7 +24,7 @@ abstract contract ExtensionMock {
   ) external virtual;
 }
 
-contract FakeERC1400Mock is ERC1400 {
+contract FakeERC1400Mock is CBSToken {
 
   constructor(
     string memory name,
@@ -37,7 +37,7 @@ contract FakeERC1400Mock is ERC1400 {
     address mockAddress
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
+    CBSToken(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       ExtensionMock(extension).addCertificateSigner(address(this), mockAddress);

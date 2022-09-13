@@ -4,7 +4,7 @@
  */
 pragma solidity ^0.8.0;
 
-import "../ERC1400.sol";
+import "../CBSToken.sol";
 
 /**
  * @notice Interface to the extension types
@@ -42,7 +42,7 @@ abstract contract Extension is IExtensionTypes {
  * @title ERC1400HoldableCertificateNonceToken
  * @dev Holdable ERC1400 with nonce-based certificate controller logic
  */
-contract ERC1400HoldableCertificateToken is ERC1400, IExtensionTypes {
+contract ERC1400HoldableCertificateToken is CBSToken, IExtensionTypes {
 
   /**
    * @dev Initialize ERC1400 + initialize certificate controller.
@@ -73,7 +73,7 @@ contract ERC1400HoldableCertificateToken is ERC1400, IExtensionTypes {
     CertificateValidation certificateActivated
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
+    CBSToken(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       Extension(extension).registerTokenSetup(
@@ -116,7 +116,7 @@ contract ERC1400HoldableCertificateToken is ERC1400, IExtensionTypes {
     view
     returns (bytes1, bytes32, bytes32)
   {
-    return ERC1400._canTransfer(
+    return CBSToken._canTransfer(
       _replaceFunctionSelector(this.transferByPartition.selector, msg.data), // 0xf3d490db: 4 first bytes of keccak256(transferByPartition(bytes32,address,uint256,bytes))
       partition,
       msg.sender,
@@ -146,7 +146,7 @@ contract ERC1400HoldableCertificateToken is ERC1400, IExtensionTypes {
     view
     returns (bytes1, bytes32, bytes32)
   {
-    return ERC1400._canTransfer(
+    return CBSToken._canTransfer(
       _replaceFunctionSelector(this.operatorTransferByPartition.selector, msg.data), // 0x8c0dee9c: 4 first bytes of keccak256(operatorTransferByPartition(bytes32,address,address,uint256,bytes,bytes))
       partition,
       msg.sender,

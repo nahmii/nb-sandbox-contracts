@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-import "../ERC1400.sol";
+import "../CBSToken.sol";
 
 /**
  * @notice Interface to the extension types
@@ -28,7 +28,7 @@ abstract contract Extension is IExtensionTypes {
   ) external virtual;
 }
 
-contract ERC1400HoldableToken is ERC1400, IExtensionTypes {
+contract ERC1400HoldableToken is CBSToken, IExtensionTypes {
 
   /**
    * @dev Initialize ERC1400 + setup the token extension.
@@ -52,7 +52,7 @@ contract ERC1400HoldableToken is ERC1400, IExtensionTypes {
     uint256 chainID
   )
     public
-    ERC1400(name, symbol, granularity, controllers, defaultPartitions, chainID)
+    CBSToken(name, symbol, granularity, controllers, defaultPartitions, chainID)
   {
     if(extension != address(0)) {
       Extension(extension).registerTokenSetup(
