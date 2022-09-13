@@ -5,7 +5,7 @@ async function main() {
   const tokenSwapAddress = `${process.env.TOKEN_SWAP_ADDRESS}`;
 
   const contract = await ethers.getContractAt(
-    "CBSToken",
+    "ERC1400",
     erc1400ContractAddress
   );
   const addMinter = await contract.addMinter(tokenSwapAddress);

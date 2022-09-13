@@ -9,7 +9,7 @@ async function main() {
   console.log("CBToken deployed to:", cbToken.address);
 
   // ========DEPLOY CBS TOKEN============
-  const cBSToken = await ethers.getContractFactory("CBSToken");
+  const cBSToken = await ethers.getContractFactory("ERC1400");
   const controller = `${process.env.CONTROLLER}`;
   const partition1 = `${process.env.PARTITION_1}`;
   const partition2 = `${process.env.PARTITION_2}`;
@@ -21,7 +21,7 @@ async function main() {
   const cbsToken = await cBSToken.deploy(
     "CBSToken",
     "CBST",
-    1,
+    4,
     [controller],
     partitions,
     chainID

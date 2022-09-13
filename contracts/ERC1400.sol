@@ -27,7 +27,7 @@ import "./tools/DomainAware.sol";
  * @title ERC1400
  * @dev ERC1400 logic
  */
-contract CBSToken is IERC20, IERC1400, Ownable, ERC1820Client, ERC1820Implementer, MinterRole, DomainAware {
+contract ERC1400 is IERC20, IERC1400, Ownable, ERC1820Client, ERC1820Implementer, MinterRole, DomainAware {
   using SafeMath for uint256;
 
   // Token

@@ -12,7 +12,7 @@ import "./ERC1820Client.sol";
 import "../interface/ERC1820Implementer.sol";
 
 import "../extensions/userExtensions/IERC1400TokensRecipient.sol";
-import "../CBSToken.sol";
+import "../ERC1400.sol";
 
 /**
  ***************************************************************************************************************
@@ -657,7 +657,7 @@ contract FundIssuer is ERC1820Client, IERC1400TokensRecipient, ERC1820Implemente
         ERC20(cycle.paymentAddress).transferFrom(msg.sender, address(this), value);
         _escrowedErc20[cycle.assetAddress][cycle.paymentAddress] += value;
       } else if(cycle.paymentType == Payment.ERC1400 && erc1400TokenData.length == 0) {
-        CBSToken(cycle.paymentAddress).operatorTransferByPartition(cycle.paymentPartition, msg.sender, address(this), value, abi.encodePacked(BYPASS_ACTION_FLAG), abi.encodePacked(BYPASS_ACTION_FLAG));
+        ERC1400(cycle.paymentAddress).operatorTransferByPartition(cycle.paymentPartition, msg.sender, address(this), value, abi.encodePacked(BYPASS_ACTION_FLAG), abi.encodePacked(BYPASS_ACTION_FLAG));
         _escrowedErc1400[cycle.assetAddress][cycle.paymentAddress][cycle.paymentPartition] += value;
       } else if(cycle.paymentType == Payment.ERC1400 && erc1400TokenData.length != 0) {
         (address erc1400TokenAddress, bytes32 erc1400TokenPartition, uint256 erc1400PaymentValue) = abi.decode(erc1400TokenData, (address, bytes32, uint256));
@@ -730,7 +730,7 @@ contract FundIssuer is ERC1820Client, IERC1400TokensRecipient, ERC1820Implemente
       ERC20(cycle.paymentAddress).transfer(recipient, order.value);
       _escrowedErc20[cycle.assetAddress][cycle.paymentAddress] -= order.value;
     } else if(cycle.paymentType == Payment.ERC1400) {
-      CBSToken(cycle.paymentAddress).transferByPartition(cycle.paymentPartition, recipient, order.value, abi.encodePacked(BYPASS_ACTION_FLAG));
+      ERC1400(cycle.paymentAddress).transferByPartition(cycle.paymentPartition, recipient, order.value, abi.encodePacked(BYPASS_ACTION_FLAG));
       _escrowedErc1400[cycle.assetAddress][cycle.paymentAddress][cycle.paymentPartition] -= order.value;
     }
   }
@@ -791,10 +791,10 @@ contract FundIssuer is ERC1820Client, IERC1400TokensRecipient, ERC1820Implemente
     _releasePayment(orderIndex, cycle.fundAddress);
 
     if(order.state == OrderState.Paid) {
-      CBSToken(cycle.assetAddress).issueByPartition(cycle.assetClass, order.investor, order.amount, "");
+      ERC1400(cycle.assetAddress).issueByPartition(cycle.assetClass, order.investor, order.amount, "");
       order.state = OrderState.PaidSettled;
     } else if (order.state == OrderState.Subscribed) {
-      CBSToken(cycle.assetAddress).issueByPartition(cycle.assetClass, address(this), order.amount, "");
+      ERC1400(cycle.assetAddress).issueByPartition(cycle.assetClass, address(this), order.amount, "");
       order.state = OrderState.UnpaidSettled;
     } else {
       revert("Impossible to settle an order that is neither in state Paid, nor Subscribed");
@@ -819,7 +819,7 @@ contract FundIssuer is ERC1820Client, IERC1400TokensRecipient, ERC1820Implemente
     if(!remainingOrdersToSettle) {
       cycle.finalized = true;
       if(totalUnpaidSettled != 0) {
-        CBSToken(cycle.assetAddress).transferByPartition(cycle.assetClass, cycle.fundAddress, totalUnpaidSettled, "");
+        ERC1400(cycle.assetAddress).transferByPartition(cycle.assetClass, cycle.fundAddress, totalUnpaidSettled, "");
       }
     } else {
       revert("Remaining orders to settle");

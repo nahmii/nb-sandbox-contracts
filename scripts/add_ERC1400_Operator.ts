@@ -10,7 +10,7 @@ async function main() {
   const tokenHolder = `${process.env.TOKEN_HOLDER}`;
 
   const contract = await ethers.getContractAt(
-    "CBSToken",
+    "ERC1400",
     erc1400ContractAddress
   );
   const addOperator = await contract.authorizeOperatorByPartition(
