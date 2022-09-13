@@ -3,13 +3,13 @@ import { ethers } from "hardhat";
 async function main() {
   // ========DEPLOY CB TOKEN============
   const CBToken = await ethers.getContractFactory("CBToken");
-  const cbToken = await CBToken.deploy("CBToken", "CBT", 18);
+  const cbToken = await CBToken.deploy("CBToken", "CBT", 4);
 
   await cbToken.deployed();
   console.log("CBToken deployed to:", cbToken.address);
 
   // ========DEPLOY CBS TOKEN============
-  const cBSToken = await ethers.getContractFactory("ERC1400");
+  const cBSToken = await ethers.getContractFactory("CBSToken");
   const controller = `${process.env.CONTROLLER}`;
   const partition1 = `${process.env.PARTITION_1}`;
   const partition2 = `${process.env.PARTITION_2}`;

@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 
 const { BigNumber } = require("@ethersproject/bignumber");
 
-const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
+const ETHER = BigNumber.from(10).pow(BigNumber.from(4));
 const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
 
 async function main() {

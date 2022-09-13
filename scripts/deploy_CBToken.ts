@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 
 async function main() {
   const CBToken = await ethers.getContractFactory("CBToken");
-  const token = await CBToken.deploy("CBToken", "CBT", 18);
+  const token = await CBToken.deploy("CBToken", "CBT", 4);
 
   await token.deployed();
 
