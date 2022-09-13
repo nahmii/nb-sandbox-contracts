@@ -13,7 +13,7 @@ async function main() {
   const cbsToken = await cBSToken.deploy(
     "CBSToken",
     "CBST",
-    1,
+    4,
     [controller],
     partitions,
     chainID

@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 async function main() {
   // ========DEPLOY CB TOKEN============
   const CBToken = await ethers.getContractFactory("CBToken");
-  const cbToken = await CBToken.deploy("CBToken", "CBT", 18);
+  const cbToken = await CBToken.deploy("CBToken", "CBT", 4);
 
   await cbToken.deployed();
   console.log("CBToken deployed to:", cbToken.address);
@@ -21,7 +21,7 @@ async function main() {
   const cbsToken = await cBSToken.deploy(
     "CBSToken",
     "CBST",
-    1,
+    4,
     [controller],
     partitions,
     chainID

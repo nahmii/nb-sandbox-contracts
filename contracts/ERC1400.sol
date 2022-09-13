@@ -678,7 +678,7 @@ contract ERC1400 is IERC20, IERC1400, Ownable, ERC1820Client, ERC1820Implementer
    * @return The number of decimals of the token. For retrocompatibility, decimals are forced to 18 in ERC1400.
    */
   function decimals() external pure returns(uint8) {
-    return uint8(18);
+    return uint8(4);
   }
   /**
    * @dev Get the smallest part of the token that’s not divisible.
