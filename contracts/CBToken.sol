@@ -29,7 +29,7 @@ contract CBToken is ERC20, AccessControl {
         _mint(to, amount);
     }
 
-    function burn(address to, uint256 amount) external onlyRole(BURNER_ROLE) {
-        _burn(to, amount);
+    function burn(address burnFrom, uint256 amount) external onlyRole(BURNER_ROLE) {
+        _burn(burnFrom, amount);
     }
 }
