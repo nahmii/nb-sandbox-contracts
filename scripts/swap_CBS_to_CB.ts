@@ -13,12 +13,10 @@ async function main() {
   );
   const partition = `${process.env.ISSUE_PARTITION}`;
   const operatorData = `${process.env.OPERATOR_DATA}`;
-  const tokenHolder = `${process.env.TOKEN_HOLDER}`;
   const value = getTokenValue(50);
 
   const redeem = await tokenSwapContract.swapCbsToCb(
     partition,
-    tokenHolder,
     value,
     operatorData
   );
