@@ -12,6 +12,7 @@ on:
 env:
   IMAGE_TAG: ${{ github.sha }}
   ECR_REPOSITORY: nb-sandbox-contracts
+  PREFIX: private
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-and-push-to-ecr:
@@ -31,7 +32,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$PREFIX-$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:$PREFIX-latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY -a
       - name: Send Slack Notification
         id: slack
