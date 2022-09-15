@@ -14,12 +14,12 @@ contract TokenSwap is AccessControl {
     CBToken public cbToken;
     CBSToken public cbsToken;
 
-    constructor(address _cbToken, address _erc1400Token) {
+    constructor(address _cbToken, address _cbsToken) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
         _grantRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
         cbToken = CBToken(_cbToken);
-        cbsToken = CBSToken(_erc1400Token);
+        cbsToken = CBSToken(_cbsToken);
     }
 
     function swapCbToCbs(bytes32 partition, uint256 value, bytes calldata data)
