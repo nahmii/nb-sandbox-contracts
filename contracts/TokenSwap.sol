@@ -5,21 +5,21 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./CBToken.sol";
-import "./ERC1400.sol";
+import "./CBSToken.sol";
 
 
 contract TokenSwap is AccessControl {
     bytes32 public constant SWAP_CB_TO_CBS_ROLE = keccak256("SWAP_CB_TO_CBS_ROLE");
     bytes32 public constant SWAP_CBS_TO_CB_ROLE = keccak256("SWAP_CBS_TO_CB_ROLE");
     CBToken public cbToken;
-    ERC1400 public cbsToken;
+    CBSToken public cbsToken;
 
-    constructor(address _cbToken, address _erc1400Token) {
+    constructor(address _cbToken, address _cbsToken) {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
         _grantRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
         cbToken = CBToken(_cbToken);
-        cbsToken = ERC1400(_erc1400Token);
+        cbsToken = CBSToken(_cbsToken);
     }
 
     function swapCbToCbs(bytes32 partition, uint256 value, bytes calldata data)
