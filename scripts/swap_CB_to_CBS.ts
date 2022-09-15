@@ -42,12 +42,7 @@ async function main() {
     await cBTokenContract.allowance(signer.address, tokenSwapAddress)
   );
 
-  const swap = await tokenSwapContract.swapCbToCbs(
-    partition,
-    tokenHolder,
-    value,
-    zeroBytes
-  );
+  const swap = await tokenSwapContract.swapCbToCbs(partition, value, zeroBytes);
 
   await swap.wait();
   console.log("swap", swap);
