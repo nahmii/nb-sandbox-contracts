@@ -15,7 +15,7 @@
     "deploy_TokenSwap": "hardhat run scripts/deploy_TokenSwap.ts --network $NETWORK",
     "deploy_All_Tokens": "hardhat run scripts/deploy_All_Tokens.ts --network $NETWORK",
     "deploy_Disperse": "hardhat run scripts/deploy_Disperse.ts --network $NETWORK",
-    "deploy_ERC1820Registry": "hardhat run scripts/deploy_ERC1820Registry.ts --network $NETWORK",
+    "deploy_ERC1820Registry": "hardhat deploy:erc1820registry --network $NETWORK",
     "test": "hardhat test"
   },
   "devDependencies": {
