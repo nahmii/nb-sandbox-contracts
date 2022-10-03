@@ -23,18 +23,18 @@ const getTotal = () => {
   return total;
 };
 
-describe("DisperseWithData", function () {
+describe.only("DisperseWithData", function () {
   let signers: any;
   let CBToken: any;
   let cbToken: any;
-  let Disperse: any;
-  let disperse: any;
+  let DisperseWithData: any;
+  let disperseWithData: any;
   let recipients: any;
 
   before(async () => {
     signers = await hre.ethers.getSigners();
     CBToken = await ethers.getContractFactory("CBToken");
-    Disperse = await ethers.getContractFactory("DisperseWithData");
+    DisperseWithData = await ethers.getContractFactory("DisperseWithData");
     recipients = [
       signers[1].address,
       signers[2].address,
@@ -57,17 +57,21 @@ describe("DisperseWithData", function () {
   });
 
   describe("Disperse Token", async () => {
-    it("Should deploy Disperse contract and send approval to withdraw tokens", async () => {
-      disperse = await Disperse.deploy();
-      await disperse.deployed();
+    it("Should deploy DisperseWithData contract and send approval to withdraw tokens", async () => {
+      disperseWithData = await DisperseWithData.deploy();
+      await disperseWithData.deployed();
     });
 
     it("Send approval Disperse contract to withdraw amount and disperse", async () => {
-      await cbToken.approve(disperse.address, getTotal());
+      await cbToken.approve(disperseWithData.address, getTotal());
     });
 
     it("Should disperse ERC20 transfers by direct transfer to recipient", async () => {
-      await disperse.disperseToken(cbToken.address, recipients, values);
+      await disperseWithData.disperseToken(
+        cbToken.address,
+        recipients,
+        values
+      );
     });
 
     it("Verify balance of recipients", async () => {
