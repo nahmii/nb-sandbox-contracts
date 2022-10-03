@@ -24,8 +24,17 @@
   "resolved" "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz"
   "version" "1.5.0"
 
-"@cspotcode/source-map-consumer@0.8.0":
-  "version" "0.8.0"
+"@consensys/universal-token@github:ConsenSys/UniversalToken":
+  "resolved" "git+ssh://git@github.com/ConsenSys/UniversalToken.git#187a8d4ef75697a3e2aca1d93eda852b241cc19e"
+  "version" "0.1.0-dev"
+  dependencies:
+    "@openzeppelin/contracts" "^4.2.0"
+    "crypto" "^1.0.1"
+    "ethereumjs-wallet" "^0.6.3"
+    "truffle" "5.4.5"
+    "truffle-contract-size" "^2.0.1"
+    "truffle-hdwallet-provider" "1.0.1"
+    "truffle-plugin-verify" "^0.5.19"
 
 "@cspotcode/source-map-support@0.7.0":
   "version" "0.7.0"
