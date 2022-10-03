@@ -4,12 +4,12 @@ import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
-import "hardhat-gas-reporter";
 import "hardhat-dependency-compiler";
-import "solidity-coverage";
 import "hardhat-contract-sizer";
 import "hardhat-erc1820";
+import "hardhat-gas-reporter";
 import { EthereumProvider } from 'hardhat/types';
+import "solidity-coverage";
 
 dotenv.config();
 
@@ -65,8 +65,15 @@ const config: HardhatUserConfig = {
           },
         },
       },
-      { version: "0.4.26" },
-      { version: "0.5.3" },
+      {
+        version: "0.4.26",
+        settings: {
+          optimizer: {
+            enabled: true, // Default: false
+            runs: 0, // Default: 200
+          },
+        },
+      },
     ],
   },
   networks: {
@@ -89,9 +96,6 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
-  },
-  dependencyCompiler: {
-    paths: ["token-research/contracts/Disperse.sol"],
   },
 };
 
