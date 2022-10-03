@@ -1,3 +1,5 @@
+import Debug from "debug";
+const debug = Debug("test:TokenSwap");
 import {expect} from "chai";
 import {ethers} from "hardhat";
 
@@ -10,7 +12,7 @@ const defaultPartitions = [PARTITION_1, PARTITION_2, PARTITION_3];
 
 const DECIMALS = 4;
 
-describe.skip("TokenSwap", function () {
+describe("TokenSwap", function () {
     let provider: any;
     let signer: any;
     let CBToken: any;
@@ -33,16 +35,15 @@ describe.skip("TokenSwap", function () {
         cbToken = await CBToken.deploy("CBToken", "CBT", DECIMALS);
         await cbToken.deployed();
 
-        const {chainId} = await provider.getNetwork();
-        cbsToken = await CBSToken.deploy("CBSToken", "CBST", DECIMALS, [signer.address], defaultPartitions, chainId);
+        cbsToken = await CBSToken.deploy("CBSToken", "CBST", DECIMALS, [signer.address], defaultPartitions);
         await cbsToken.deployed();
 
         cbTokenTotalSupply = await cbToken.totalSupply();
-        console.log("CB token total supply", ethers.utils.formatUnits(cbTokenTotalSupply, DECIMALS));
+        debug("CB token total supply", ethers.utils.formatUnits(cbTokenTotalSupply, DECIMALS));
         expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply);
 
         const cbsTokenTotalSupply = await cbsToken.totalSupply();
-        console.log("CBS token total supply", ethers.utils.formatUnits(cbsTokenTotalSupply, DECIMALS));
+        debug("CBS token total supply", ethers.utils.formatUnits(cbsTokenTotalSupply, DECIMALS));
         expect(cbsTokenTotalSupply).to.equal(ethers.constants.Zero)
         expect(await cbsToken.balanceOf(signer.address)).to.equal(ethers.constants.Zero);
     });
