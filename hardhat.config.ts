@@ -4,7 +4,6 @@ import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
-import "hardhat-dependency-compiler";
 import "hardhat-contract-sizer";
 import "hardhat-erc1820";
 import "hardhat-gas-reporter";
