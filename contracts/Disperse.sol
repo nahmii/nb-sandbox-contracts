@@ -23,7 +23,7 @@ contract DisperseWithData is ERC1820Client {
     ERC1820Client.setInterfaceImplementation(DISPERSE_WITH_DATA_INTERFACE_NAME, address(this));
     }
 
-    function getDataLenght() public view returns (uint256) {
+    function getDataLength() public view returns (uint256) {
         return messageData.length;
     }
     function disperseEther(address[] memory recipients, uint256[] memory values)
