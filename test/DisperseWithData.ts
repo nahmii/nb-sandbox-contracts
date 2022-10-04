@@ -23,7 +23,7 @@ const getTotal = () => {
   return total;
 };
 
-describe("Disperse", function () {
+describe("DisperseWithData", function () {
   let signers: any;
   let CBToken: any;
   let cbToken: any;
@@ -34,7 +34,7 @@ describe("Disperse", function () {
   before(async () => {
     signers = await hre.ethers.getSigners();
     CBToken = await ethers.getContractFactory("CBToken");
-    Disperse = await ethers.getContractFactory("Disperse");
+    Disperse = await ethers.getContractFactory("DisperseWithData");
     recipients = [
       signers[1].address,
       signers[2].address,
@@ -67,11 +67,7 @@ describe("Disperse", function () {
     });
 
     it("Should disperse ERC20 transfers by direct transfer to recipient", async () => {
-      await disperse.disperseToken(
-        cbToken.address,
-        recipients,
-        values
-      );
+      await disperse.disperseToken(cbToken.address, recipients, values);
     });
 
     it("Verify balance of recipients", async () => {
