@@ -61,7 +61,7 @@ contract DisperseWithData is ERC1820Client {
         IERC1400 token,
         address[] memory recipients,
         uint256[] memory values,
-        bytes[] calldata data
+        bytes calldata data
     ) external {
         uint256 total = 0;
         for (uint256 i = 0; i < recipients.length; i++) total += values[i];
@@ -70,29 +70,25 @@ contract DisperseWithData is ERC1820Client {
             if(interfaceAddr(address(token), "ERC1400Token") == address(0)) {
                 require(token.transfer(recipients[i], values[i]));
             } else {
-                token.transferWithData(recipients[i], values[i], data[i]);
-              
+                token.transferWithData(recipients[i], values[i], data);
             }
-            messageData.push(data[i]);
-           
         }
-          
+        messageData.push(data);
     }
 
     function disperseTokenWithDataSimple(
         IERC1400 token, 
         address[] memory recipients, 
         uint256[] memory values, 
-        bytes[] calldata data) external 
-    {
+        bytes calldata data
+    ) external {
          for (uint256 i = 0; i < recipients.length; i++) {
             if(interfaceAddr(address(token), "ERC1400Token") == address(0)) {
                require(token.transferFrom(msg.sender, recipients[i], values[i]));
             } else {
-                token.transferFromWithData(msg.sender, recipients[i], values[i], data[i]);
+                token.transferFromWithData(msg.sender, recipients[i], values[i], data);
             }
-            messageData.push(data[i]);   
          }
+        messageData.push(data);
     }
-
 }
