@@ -1003,6 +1003,13 @@
     "mcl-wasm" "^0.7.1"
     "rustbn.js" "~0.2.0"
 
+"@nomicfoundation/hardhat-network-helpers@^1.0.6":
+  "integrity" "sha512-a35iVD4ycF6AoTfllAnKm96IPIzzHpgKX/ep4oKc2bsUKFfMlacWdyntgC/7d5blyCTXfFssgNAvXDZfzNWVGQ=="
+  "resolved" "https://registry.npmjs.org/@nomicfoundation/hardhat-network-helpers/-/hardhat-network-helpers-1.0.6.tgz"
+  "version" "1.0.6"
+  dependencies:
+    "ethereumjs-util" "^7.1.4"
+
 "@nomicfoundation/solidity-analyzer-darwin-x64@0.0.3":
   "integrity" "sha512-HuJd1K+2MgmFIYEpx46uzwEFjvzKAI765mmoMxy4K+Aqq1p+q7hHRlsFU2kx3NB8InwotkkIq3A5FLU1sI1WDw=="
   "resolved" "https://registry.npmjs.org/@nomicfoundation/solidity-analyzer-darwin-x64/-/solidity-analyzer-darwin-x64-0.0.3.tgz"
@@ -6559,7 +6566,7 @@
     "ethjs-util" "0.1.6"
     "rlp" "^2.2.3"
 
-"ethereumjs-util@^7.0.10", "ethereumjs-util@^7.1.0", "ethereumjs-util@^7.1.5":
+"ethereumjs-util@^7.0.10", "ethereumjs-util@^7.1.0", "ethereumjs-util@^7.1.4", "ethereumjs-util@^7.1.5":
   "integrity" "sha512-SDl5kKrQAudFBUe5OJM9Ac6WmMyYmXX/6sTmLZ3ffG2eY6ZIGBes3pEDxNN6V72WyOw4CPD5RomKdsa8DAAwLg=="
   "resolved" "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-7.1.5.tgz"
   "version" "7.1.5"
@@ -7919,7 +7926,7 @@
     "eth-gas-reporter" "^0.2.25"
     "sha1" "^1.1.1"
 
-"hardhat@^2.0.0", "hardhat@^2.0.2", "hardhat@^2.0.4", "hardhat@^2.11.0", "hardhat@^2.11.2", "hardhat@^2.9.9":
+"hardhat@^2.0.0", "hardhat@^2.0.2", "hardhat@^2.0.4", "hardhat@^2.11.0", "hardhat@^2.11.2", "hardhat@^2.9.5", "hardhat@^2.9.9":
   "integrity" "sha512-BdsXC1CFJQDJKmAgCwpmGhFuVU6dcqlgMgT0Kg/xmFAFVugkpYu6NRmh4AaJ3Fah0/BR9DOR4XgQGIbg4eon/Q=="
   "resolved" "https://registry.npmjs.org/hardhat/-/hardhat-2.11.2.tgz"
   "version" "2.11.2"
