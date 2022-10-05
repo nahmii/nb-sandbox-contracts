@@ -96,7 +96,7 @@ contract DisperseWithData is Disperse, ERC1820Client {
                     msg.sender,
                     recipients[i],
                     values[i],
-                        _data
+                    _data
                 );
             }
         }
