@@ -48,7 +48,7 @@ contract ERC1820Client {
 contract DisperseWithData is Disperse, ERC1820Client {
     bytes[] public data;
 
-    function getDataLength() public view returns (uint256) {
+    function getDataLength() external view returns (uint256) {
         return data.length;
     }
 
@@ -58,8 +58,10 @@ contract DisperseWithData is Disperse, ERC1820Client {
         bytes _data
     ) external payable {
         for (uint256 i = 0; i < recipients.length; i++) recipients[i].transfer(values[i]);
+
         uint256 balance = address(this).balance;
         if (balance > 0) msg.sender.transfer(balance);
+
         data.push(_data);
     }
 
@@ -70,15 +72,20 @@ contract DisperseWithData is Disperse, ERC1820Client {
         bytes _data
     ) external {
         uint256 total = 0;
-        for (uint256 i = 0; i < recipients.length; i++) total += values[i];
+        uint i = 0;
+
+        for (i = 0; i < recipients.length; i++) total += values[i];
+
         require(token.transferFrom(msg.sender, address(this), total)); // solhint-disable-line reason-string
-        for (i = 0; i < recipients.length; i++) {
-            if (interfaceAddr(address(token), "ERC1400Token") == address(0)) {
-                require(token.transfer(recipients[i], values[i])); // solhint-disable-line reason-string
-            } else {
+
+        if (interfaceAddr(address(token), "ERC1400Token") == address(0))
+            for (i = 0; i < recipients.length; i++)
+                // solhint-disable-next-line reason-string
+                require(token.transfer(recipients[i], values[i]));
+        else
+            for (i = 0; i < recipients.length; i++)
                 IERC1400(address(token)).transferWithData(recipients[i], values[i], _data);
-            }
-        }
+
         data.push(_data);
     }
 
@@ -88,18 +95,21 @@ contract DisperseWithData is Disperse, ERC1820Client {
         uint256[] values,
         bytes _data
     ) external {
-        for (uint256 i = 0; i < recipients.length; i++) {
-            if (interfaceAddr(address(token), "ERC1400Token") == address(0)) {
-                require(token.transferFrom(msg.sender, recipients[i], values[i])); // solhint-disable-line reason-string
-            } else {
+        uint256 i;
+
+        if (interfaceAddr(address(token), "ERC1400Token") == address(0))
+            for (i = 0; i < recipients.length; i++)
+                // solhint-disable-next-line reason-string
+                require(token.transferFrom(msg.sender, recipients[i], values[i]));
+        else
+            for (i = 0; i < recipients.length; i++)
                 IERC1400(address(token)).transferFromWithData(
                     msg.sender,
                     recipients[i],
                     values[i],
                     _data
                 );
-            }
-        }
+
         data.push(_data);
     }
 }
