@@ -1,13 +1,13 @@
 FROM node:16-alpine
 
 WORKDIR /usr/src/app
-RUN apk add --no-cache python3 make g++
+RUN apk add --no-cache python3 make g++ libc6-compat
 
 COPY package*.json ./
-RUN npm install
+RUN npm clean-install --ignore-scripts
 COPY . . 
 
-RUN npm run compile
+RUN npm run build
 RUN npm run test
 
 COPY $PWD/docker/* /usr/local/bin/

@@ -1,83 +1,421 @@
-import { expect } from "chai";
-import { ethers } from "hardhat";
-const hre = require("hardhat");
+import { expect } from 'chai'
+import * as hre from 'hardhat'
+import { BigNumber, Contract } from 'ethers'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
-const { BigNumber } = require("@ethersproject/bignumber");
+const { ethers } = hre
 
-const ETHER = BigNumber.from(10).pow(BigNumber.from(18));
-const getTokenValue = (value: number) => BigNumber.from(value).mul(ETHER);
+const getWei = (value: number) => ethers.utils.parseEther(value.toString())
 
-const values = [
-  getTokenValue(10),
-  getTokenValue(20),
-  getTokenValue(30),
-  getTokenValue(40),
-  getTokenValue(50),
-];
+const transferValues = [
+  getWei(10),
+  getWei(20),
+  getWei(30),
+  getWei(40),
+  getWei(50),
+]
 
-const getTotal = () => {
-  let total = values[0];
-  for (let i = 1; i < values.length; i++) {
-    total = total.add(values[i]);
+const getTotalTransferValue = () => {
+  let total = transferValues[0]
+  for (let i = 1; i < transferValues.length; i++) {
+    total = total.add(transferValues[i])
   }
-  return total;
-};
+  return total
+}
 
-describe("DisperseWithData", function () {
-  let signers: any;
-  let CBToken: any;
-  let cbToken: any;
-  let Disperse: any;
-  let disperse: any;
-  let recipients: any;
+const cbsControllers = ['0xBc5C5A1C8AD76d40Ce8742e404a053ecE7B6253c']
 
-  before(async () => {
-    signers = await hre.ethers.getSigners();
-    CBToken = await ethers.getContractFactory("CBToken");
-    Disperse = await ethers.getContractFactory("DisperseWithData");
-    recipients = [
-      signers[1].address,
-      signers[2].address,
-      signers[3].address,
-      signers[4].address,
-      signers[5].address,
-    ];
-  });
+const cbsPartitions = [
+  '0x7265736572766564000000000000000000000000000000000000000000000000',
+  '0x6973737565640000000000000000000000000000000000000000000000000000',
+  '0x6c6f636b65640000000000000000000000000000000000000000000000000000',
+]
 
-  describe("Deploy CBToken", async () => {
-    it("Should deploy and mint 1000000  CBToken", async () => {
-      cbToken = await CBToken.deploy("CBToken", "CBToken", 18);
-      await cbToken.deployed();
+describe('DisperseWithData', function () {
+  let signer: SignerWithAddress
+  let recipients: SignerWithAddress[]
+  let disperseWithData: Contract
+  let cbToken: Contract
+  let cbsToken: Contract
 
-      let balance = await cbToken.balanceOf(signers[0].address);
-      balance = ethers.utils.formatEther(balance);
-      const expected = ethers.utils.formatEther(await cbToken.totalSupply());
-      expect(balance).to.equal(expected);
-    });
-  });
+  async function defineFixture() {
+    ;[signer, ...recipients] = (await hre.ethers.getSigners()).slice(0, 6)
 
-  describe("Disperse Token", async () => {
-    it("Should deploy Disperse contract and send approval to withdraw tokens", async () => {
-      disperse = await Disperse.deploy();
-      await disperse.deployed();
-    });
+    const CBToken = await ethers.getContractFactory('CBToken')
+    const cbToken = await CBToken.deploy('CBToken', 'CBT', 18)
+    await cbToken.deployed()
 
-    it("Send approval Disperse contract to withdraw amount and disperse", async () => {
-      await cbToken.approve(disperse.address, getTotal());
-    });
+    const CBSToken = await ethers.getContractFactory('CBSToken')
+    const cbsToken = await CBSToken.deploy(
+      'CBSToken',
+      'CBST',
+      1,
+      cbsControllers,
+      cbsPartitions
+    )
+    await cbToken.deployed()
+    await cbsToken.issue(signer.address, getWei(1_000_000), '0x')
 
-    it("Should disperse ERC20 transfers by direct transfer to recipient", async () => {
-      await disperse.disperseToken(cbToken.address, recipients, values);
-    });
+    const DisperseWithData = await ethers.getContractFactory('DisperseWithData')
+    const disperseWithData = await DisperseWithData.deploy()
+    await disperseWithData.deployed()
 
-    it("Verify balance of recipients", async () => {
-      for (let i = 0; i < recipients.length; i++) {
-        let balance = await cbToken.balanceOf(recipients[i]);
-        balance = ethers.utils.formatEther(balance);
-        const expected = ethers.utils.formatEther(values[i]);
+    return { signer, recipients, cbToken, cbsToken, disperseWithData }
+  }
 
-        expect(balance).to.equal(expected);
+  describe('#getDataLength()', async () => {
+    beforeEach(async () => {
+      ;({ disperseWithData } = await loadFixture(defineFixture))
+    })
+
+    it('should return the length of the messageData state variable', async () => {
+      const dataLength = await disperseWithData.getDataLength()
+      expect(dataLength).to.equal(ethers.constants.Zero)
+    })
+  })
+
+  describe('#disperseEther()', async () => {
+    let recipientPreBalances: BigNumber[]
+    let recipientAddresses: string[]
+
+    beforeEach(async () => {
+      ;({ recipients, disperseWithData } = await loadFixture(defineFixture))
+
+      recipientPreBalances = await Promise.all(
+        recipients.map((recipient) => recipient.getBalance('latest'))
+      )
+      recipientAddresses = recipients.map((recipient) => recipient.address)
+    })
+
+    it('should disperse ETH transfers by transfer to each recipient', async () => {
+      await disperseWithData.disperseEther(recipientAddresses, transferValues, {
+        value: ethers.utils.parseEther('1000'),
+      })
+
+      const expectedDataLength = await disperseWithData.getDataLength()
+      expect(expectedDataLength).to.equal(ethers.constants.Zero)
+
+      for (const [i, recipient] of recipients.entries()) {
+        const postBalance = await recipient.getBalance('latest')
+        expect(postBalance).to.equal(
+          recipientPreBalances[i].add(transferValues[i])
+        )
       }
-    });
-  });
-});
+    })
+  })
+
+  describe('#disperseEtherWithData()', async () => {
+    let recipientPreBalances: BigNumber[]
+    let recipientAddresses: string[]
+    let data: string
+
+    beforeEach(async () => {
+      ;({ recipients, disperseWithData } = await loadFixture(defineFixture))
+
+      recipientPreBalances = await Promise.all(
+        recipients.map((recipient) => recipient.getBalance('latest'))
+      )
+      recipientAddresses = recipients.map((recipient) => recipient.address)
+
+      data = ethers.utils.hexlify(ethers.utils.randomBytes(32))
+    })
+
+    it('should disperse ETH transfers by transfer to each recipient', async () => {
+      await disperseWithData.disperseEtherWithData(
+        recipientAddresses,
+        transferValues,
+        data,
+        {
+          value: ethers.utils.parseEther('1000'),
+        }
+      )
+
+      const expectedDataLength = await disperseWithData.getDataLength()
+      expect(expectedDataLength).to.equal(ethers.constants.One)
+      const expectedData = await disperseWithData.data(ethers.constants.Zero)
+      expect(expectedData).to.equal(data)
+
+      for (const [i, recipient] of recipients.entries()) {
+        const postBalance = await recipient.getBalance('latest')
+        expect(postBalance).to.equal(
+          recipientPreBalances[i].add(transferValues[i])
+        )
+      }
+    })
+  })
+
+  describe('#disperseToken()', async () => {
+    let recipientAddresses: string[]
+
+    describe('with ERC20 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbToken.approve(disperseWithData.address, getTotalTransferValue())
+      })
+
+      it('should disperse ERC20 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseToken(
+          cbToken.address,
+          recipientAddresses,
+          transferValues
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.Zero)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+
+    describe('with ERC1400 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbsToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbsToken.approve(
+          disperseWithData.address,
+          getTotalTransferValue()
+        )
+      })
+
+      it('should disperse ERC1400 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseToken(
+          cbsToken.address,
+          recipientAddresses,
+          transferValues
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.Zero)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbsToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+  })
+
+  describe('#disperseTokenWithData()', async () => {
+    let recipientAddresses: string[]
+    let data: string
+
+    beforeEach(async () => {
+      data = ethers.utils.hexlify(ethers.utils.randomBytes(32))
+    })
+
+    describe('with ERC20 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbToken.approve(disperseWithData.address, getTotalTransferValue())
+      })
+
+      it('should disperse ERC20 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenWithData(
+          cbToken.address,
+          recipientAddresses,
+          transferValues,
+          data
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.One)
+        const expectedData = await disperseWithData.data(ethers.constants.Zero)
+        expect(expectedData).to.equal(data)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+
+    describe('with ERC1400 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbsToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbsToken.approve(
+          disperseWithData.address,
+          getTotalTransferValue()
+        )
+      })
+
+      it('should disperse ERC1400 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenWithData(
+          cbsToken.address,
+          recipientAddresses,
+          transferValues,
+          data
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.One)
+        const expectedData = await disperseWithData.data(ethers.constants.Zero)
+        expect(expectedData).to.equal(data)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbsToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+  })
+
+  describe('#disperseTokenSimple()', async () => {
+    let recipientAddresses: string[]
+
+    describe('with ERC20 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbToken.approve(disperseWithData.address, getTotalTransferValue())
+      })
+
+      it('should disperse ERC20 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenSimple(
+          cbToken.address,
+          recipientAddresses,
+          transferValues
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.Zero)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+
+    describe('with ERC1400 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbsToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbsToken.approve(
+          disperseWithData.address,
+          getTotalTransferValue()
+        )
+      })
+
+      it('should disperse ERC1400 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenSimple(
+          cbsToken.address,
+          recipientAddresses,
+          transferValues
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.Zero)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbsToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+  })
+
+  describe('#disperseTokenWithDataSimple()', async () => {
+    let recipientAddresses: string[]
+    let data: string
+
+    beforeEach(async () => {
+      data = ethers.utils.hexlify(ethers.utils.randomBytes(32))
+    })
+
+    describe('with ERC20 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbToken.approve(disperseWithData.address, getTotalTransferValue())
+      })
+
+      it('should disperse ERC20 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenWithDataSimple(
+          cbToken.address,
+          recipientAddresses,
+          transferValues,
+          data
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.One)
+        const expectedData = await disperseWithData.data(ethers.constants.Zero)
+        expect(expectedData).to.equal(data)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+
+    describe('with ERC1400 token', async () => {
+      beforeEach(async () => {
+        ;({ recipients, disperseWithData, cbsToken } = await loadFixture(
+          defineFixture
+        ))
+
+        recipientAddresses = recipients.map((recipient) => recipient.address)
+
+        await cbsToken.approve(
+          disperseWithData.address,
+          getTotalTransferValue()
+        )
+      })
+
+      it('should disperse ERC1400 transfers by transfer to each recipient', async () => {
+        await disperseWithData.disperseTokenWithDataSimple(
+          cbsToken.address,
+          recipientAddresses,
+          transferValues,
+          data
+        )
+
+        const expectedDataLength = await disperseWithData.getDataLength()
+        expect(expectedDataLength).to.equal(ethers.constants.One)
+        const expectedData = await disperseWithData.data(ethers.constants.Zero)
+        expect(expectedData).to.equal(data)
+
+        for (const [i, recipientAddress] of recipientAddresses.entries()) {
+          const balance = await cbsToken.balanceOf(recipientAddress)
+          expect(balance).to.equal(transferValues[i])
+        }
+      })
+    })
+  })
+})

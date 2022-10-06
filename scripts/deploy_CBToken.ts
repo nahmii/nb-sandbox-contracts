@@ -1,15 +1,15 @@
-import { ethers } from "hardhat";
+import { ethers } from 'hardhat'
 
 async function main() {
-  const CBToken = await ethers.getContractFactory("CBToken");
-  const token = await CBToken.deploy("CBToken", "CBT", 4);
+  const CBToken = await ethers.getContractFactory('CBToken')
+  const token = await CBToken.deploy('CBToken', 'CBT', 4)
 
-  await token.deployed();
+  await token.deployed()
 
-  console.log("Token deployed to:", token.address);
+  console.log('Token deployed to:', token.address)
 }
 
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})

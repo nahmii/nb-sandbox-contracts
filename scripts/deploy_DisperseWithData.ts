@@ -1,15 +1,15 @@
-import { ethers } from "hardhat";
+import { ethers } from 'hardhat'
 
 async function main() {
-  const Disperse = await ethers.getContractFactory("DisperseWithData");
-  const disperse = await Disperse.deploy();
+  const Disperse = await ethers.getContractFactory('DisperseWithData')
+  const disperse = await Disperse.deploy()
 
-  await disperse.deployed();
+  await disperse.deployed()
 
-  console.log("DisperseWithData deployed to:", disperse.address);
+  console.log('DisperseWithData deployed to:', disperse.address)
 }
 
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})

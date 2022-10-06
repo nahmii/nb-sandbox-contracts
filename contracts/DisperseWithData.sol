@@ -1,94 +1,115 @@
+pragma solidity ^0.4.25; // solhint-disable-line compiler-version
+pragma experimental ABIEncoderV2;
 
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+import "@banteg/disperse-research/contracts/Disperse.sol";
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./tools/ERC1820Client.sol";
+interface IERC1400 {
+    function transferWithData(
+        address to,
+        uint256 value,
+        bytes data
+    ) external;
 
- interface IERC1400 is IERC20 {
- // *********************** Transfers ************************
-  function transferWithData(address to, uint256 value, bytes calldata data) external;
-  function transferFromWithData(address from, address to, uint256 value, bytes calldata data) external;
-} 
+    function transferFromWithData(
+        address from,
+        address to,
+        uint256 value,
+        bytes data
+    ) external;
+}
 
+interface IERC1820Registry {
+    function setInterfaceImplementer(
+        address account,
+        bytes32 _interfaceHash,
+        address implementer
+    ) external;
 
-
-contract DisperseWithData is ERC1820Client {
-    bytes[] public messageData;
-
-    string constant internal DISPERSE_WITH_DATA_INTERFACE_NAME = "DisperseWithData";
-
-    constructor() {
-    // Register contract in ERC1820 registry
-    ERC1820Client.setInterfaceImplementation(DISPERSE_WITH_DATA_INTERFACE_NAME, address(this));
-    }
-
-    function getDataLength() public view returns (uint256) {
-        return messageData.length;
-    }
-    function disperseEther(address[] memory recipients, uint256[] memory values)
+    function getInterfaceImplementer(address account, bytes32 _interfaceHash)
         external
-        payable
+        view
+        returns (address);
+}
+
+contract ERC1820Client {
+    IERC1820Registry private constant ERC1820REGISTRY =
+        IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
+
+    function interfaceAddr(address addr, string memory _interfaceLabel)
+        internal
+        view
+        returns (address)
     {
-        for (uint256 i = 0; i < recipients.length; i++)
-            payable(recipients[i]).transfer(values[i]);
+        bytes32 interfaceHash = keccak256(abi.encodePacked(_interfaceLabel));
+        return ERC1820REGISTRY.getInterfaceImplementer(addr, interfaceHash);
+    }
+}
+
+contract DisperseWithData is Disperse, ERC1820Client {
+    bytes[] public data;
+
+    function getDataLength() external view returns (uint256) {
+        return data.length;
+    }
+
+    function disperseEtherWithData(
+        address[] recipients,
+        uint256[] values,
+        bytes _data
+    ) external payable {
+        for (uint256 i = 0; i < recipients.length; i++) recipients[i].transfer(values[i]);
+
         uint256 balance = address(this).balance;
-        if (balance > 0) payable(msg.sender).transfer(balance);
-    }
+        if (balance > 0) msg.sender.transfer(balance);
 
-    function disperseToken(
-        IERC1400 token,
-        address[] memory recipients,
-        uint256[] memory values
-    ) external {
-        uint256 total = 0;
-        for (uint256 i = 0; i < recipients.length; i++) total += values[i];
-        require(token.transferFrom(msg.sender, address(this), total));
-        for (uint256 i = 0; i < recipients.length; i++)
-            require(token.transfer(recipients[i], values[i]));
-    }
-
-    function disperseTokenSimple(
-        IERC1400 token,
-        address[] memory recipients,
-        uint256[] memory values
-    ) external {
-        for (uint256 i = 0; i < recipients.length; i++)
-            require(token.transferFrom(msg.sender, recipients[i], values[i]));
+        data.push(_data);
     }
 
     function disperseTokenWithData(
-        IERC1400 token,
-        address[] memory recipients,
-        uint256[] memory values,
-        bytes calldata data
+        IERC20 token,
+        address[] recipients,
+        uint256[] values,
+        bytes _data
     ) external {
         uint256 total = 0;
-        for (uint256 i = 0; i < recipients.length; i++) total += values[i];
-        require(token.transferFrom(msg.sender, address(this), total));
-        for (uint256 i = 0; i < recipients.length; i++) {
-            if(interfaceAddr(address(token), "ERC1400Token") == address(0)) {
+        uint i = 0;
+
+        for (i = 0; i < recipients.length; i++) total += values[i];
+
+        require(token.transferFrom(msg.sender, address(this), total)); // solhint-disable-line reason-string
+
+        if (interfaceAddr(address(token), "ERC1400Token") == address(0))
+            for (i = 0; i < recipients.length; i++)
+                // solhint-disable-next-line reason-string
                 require(token.transfer(recipients[i], values[i]));
-            } else {
-                token.transferWithData(recipients[i], values[i], data);
-            }
-        }
-        messageData.push(data);
+        else
+            for (i = 0; i < recipients.length; i++)
+                IERC1400(address(token)).transferWithData(recipients[i], values[i], _data);
+
+        data.push(_data);
     }
 
     function disperseTokenWithDataSimple(
-        IERC1400 token, 
-        address[] memory recipients, 
-        uint256[] memory values, 
-        bytes calldata data
+        IERC20 token,
+        address[] recipients,
+        uint256[] values,
+        bytes _data
     ) external {
-         for (uint256 i = 0; i < recipients.length; i++) {
-            if(interfaceAddr(address(token), "ERC1400Token") == address(0)) {
-               require(token.transferFrom(msg.sender, recipients[i], values[i]));
-            } else {
-                token.transferFromWithData(msg.sender, recipients[i], values[i], data);
-            }
-         }
-        messageData.push(data);
+        uint256 i;
+
+        if (interfaceAddr(address(token), "ERC1400Token") == address(0))
+            for (i = 0; i < recipients.length; i++)
+                // solhint-disable-next-line reason-string
+                require(token.transferFrom(msg.sender, recipients[i], values[i]));
+        else
+            for (i = 0; i < recipients.length; i++)
+                IERC1400(address(token)).transferFromWithData(
+                    msg.sender,
+                    recipients[i],
+                    values[i],
+                    _data
+                );
+
+        data.push(_data);
     }
 }
