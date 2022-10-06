@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache python3 make g++ libc6-compat
 
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm clean-install --ignore-scripts
 COPY . . 
 
 RUN npm run build
