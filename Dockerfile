@@ -7,7 +7,7 @@ COPY package*.json ./
 RUN npm ci --ignore-scripts
 COPY . . 
 
-RUN npm run compile
+RUN npm run build
 RUN npm run test
 
 COPY $PWD/docker/* /usr/local/bin/

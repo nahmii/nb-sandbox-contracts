@@ -6,8 +6,8 @@
   "scripts": {
     "add_ERC1400_Minter": "hardhat run scripts/add_ERC1400_Minter.ts --network $NETWORK",
     "add_ERC1400_Operator": "hardhat run scripts/add_ERC1400_Operator.ts --network $NETWORK",
+    "build": "hardhat compile",
     "clean": "hardhat clean",
-    "compile": "hardhat compile",
     "deploy_CBToken": "hardhat run scripts/deploy_CBToken.ts --network $NETWORK",
     "deploy_CBSToken": "hardhat run scripts/deploy_CBSToken.ts --network $NETWORK",
     "deploy_TokenSwap": "hardhat run scripts/deploy_TokenSwap.ts --network $NETWORK",
