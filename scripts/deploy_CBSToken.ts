@@ -6,12 +6,14 @@ async function main() {
   const partition1 = `${process.env.PARTITION_1}`
   const partition2 = `${process.env.PARTITION_2}`
   const partition3 = `${process.env.PARTITION_3}`
+  const tokenName = `${process.env.TOKEN_NAME}`
+  const tokenSymbol = `${process.env.TOKEN_SYMBOL}`
 
   const partitions = [partition1, partition2, partition3]
 
   const cbsToken = await cBSToken.deploy(
-    'CBSToken',
-    'CBST',
+    tokenName,
+    tokenSymbol,
     4,
     [controller],
     partitions
