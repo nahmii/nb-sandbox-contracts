@@ -1,8 +1,10 @@
 import { ethers } from 'hardhat'
 
 async function main() {
+  const cBTokenName = `${process.env.CBTOKEN_NAME}`
+  const cBTokenSymbol = `${process.env.CBTOKEN_SYMBOL}`
   const CBToken = await ethers.getContractFactory('CBToken')
-  const token = await CBToken.deploy('CBToken', 'CBT', 4)
+  const token = await CBToken.deploy(cBTokenName, cBTokenSymbol, 4)
 
   await token.deployed()
 

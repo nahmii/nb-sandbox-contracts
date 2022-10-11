@@ -1,9 +1,14 @@
 import { ethers } from 'hardhat'
 
 async function main() {
+  const cBTokenName = `${process.env.CBTOKEN_NAME}`
+  const cBTokenSymbol = `${process.env.CBTOKEN_SYMBOL}`
+  const cBSTokenName = `${process.env.CBSTOKEN_NAME}`
+  const cBSTokenSymbol = `${process.env.CBSTOKEN_SYMBOL}`
+
   // ========DEPLOY CB TOKEN============
   const CBToken = await ethers.getContractFactory('CBToken')
-  const cbToken = await CBToken.deploy('CBToken', 'CBT', 4)
+  const cbToken = await CBToken.deploy(cBTokenName, cBTokenSymbol, 4)
 
   await cbToken.deployed()
   console.log('CBToken deployed to:', cbToken.address)
@@ -18,8 +23,8 @@ async function main() {
   const partitions = [partition1, partition2, partition3]
 
   const cbsToken = await cBSToken.deploy(
-    'CBSToken',
-    'CBST',
+    cBSTokenName,
+    cBSTokenSymbol,
     4,
     [controller],
     partitions
