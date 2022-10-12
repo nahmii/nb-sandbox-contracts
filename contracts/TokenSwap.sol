@@ -13,9 +13,11 @@ contract TokenSwap is AccessControl {
     CBSToken public cbsToken;
 
     constructor(address _cbToken, address _cbsToken) {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
-        _grantRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(SWAP_CB_TO_CBS_ROLE, msg.sender);
+        _setupRole(SWAP_CBS_TO_CB_ROLE, msg.sender);
+        _setRoleAdmin(SWAP_CB_TO_CBS_ROLE, DEFAULT_ADMIN_ROLE);
+        _setRoleAdmin(SWAP_CBS_TO_CB_ROLE, DEFAULT_ADMIN_ROLE);
         cbToken = CBToken(_cbToken);
         cbsToken = CBSToken(_cbsToken);
     }
