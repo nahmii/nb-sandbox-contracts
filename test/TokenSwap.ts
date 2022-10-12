@@ -34,18 +34,21 @@ describe('TokenSwap', function () {
   before(async () => {
     ;[admin, accountOne] = await ethers.getSigners()
     CBToken = await ethers.getContractFactory('CBToken')
-    CBSToken = await ethers.getContractFactory('ERC1400')
+    CBSToken = await ethers.getContractFactory('CBSToken')
     TokenSwap = await ethers.getContractFactory('TokenSwap')
 
     cbToken = await CBToken.deploy('CBToken', 'CBT', DECIMALS)
     await cbToken.deployed()
+
+    const { chainId } = await ethers.provider.getNetwork()
 
     cbsToken = await CBSToken.deploy(
       'CBSToken',
       'CBST',
       DECIMALS,
       [admin.address],
-      defaultPartitions
+      defaultPartitions,
+      chainId
     )
     await cbsToken.deployed()
 

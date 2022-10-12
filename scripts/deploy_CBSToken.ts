@@ -11,12 +11,15 @@ async function main() {
 
   const partitions = [partition1, partition2, partition3]
 
+  const { chainId } = await ethers.provider.getNetwork()
+
   const cbsToken = await cBSToken.deploy(
     cBSTokenName,
     cBSTokenSymbol,
     4,
     [controller],
-    partitions
+    partitions,
+    chainId
   )
 
   await cbsToken.deployed()

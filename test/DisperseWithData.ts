@@ -46,13 +46,16 @@ describe('DisperseWithData', function () {
     const cbToken = await CBToken.deploy('CBToken', 'CBT', 18)
     await cbToken.deployed()
 
+    const { chainId } = await ethers.provider.getNetwork()
+
     const CBSToken = await ethers.getContractFactory('CBSToken')
     const cbsToken = await CBSToken.deploy(
       'CBSToken',
       'CBST',
       1,
       cbsControllers,
-      cbsPartitions
+      cbsPartitions,
+      chainId
     )
     await cbToken.deployed()
     await cbsToken.issue(signer.address, getWei(1_000_000), '0x')
