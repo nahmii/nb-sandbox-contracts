@@ -66,6 +66,6 @@
   "dependencies": {
     "@banteg/disperse-research": "github:banteg/disperse-research",
     "@consensys/universal-token": "github:ConsenSys/UniversalToken",
-    "@openzeppelin/contracts": "^4.7.3"
+    "@openzeppelin/contracts": "^4.2.0"
   }
 }
