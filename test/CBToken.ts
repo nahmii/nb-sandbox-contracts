@@ -18,8 +18,8 @@ describe('CBToken', function () {
 
   const DEFAULT_ADMIN_ROLE =
     '0x0000000000000000000000000000000000000000000000000000000000000000'
-  const BURNER_ROLE = ethers.utils.id('BURNER_ROLE')
   const MINTER_ROLE = ethers.utils.id('MINTER_ROLE')
+  const BURNER_ROLE = ethers.utils.id('BURNER_ROLE')
   const ROLE = ethers.utils.id('ROLE')
 
   let token: Contract

@@ -1,9 +1,9 @@
 import Debug from 'debug'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
-const debug = Debug('test:TokenSwap')
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
-const hre = require('hardhat')
+const debug = Debug('test:TokenSwap')
 
 const PARTITION_1 =
   '0x7265736572766564000000000000000000000000000000000000000000000000' // "reserved" in hex
@@ -15,8 +15,12 @@ const defaultPartitions = [PARTITION_1, PARTITION_2, PARTITION_3]
 
 const DECIMALS = 4
 
+const SWAP_CB_TO_CBS_ROLE = ethers.utils.id('SWAP_CB_TO_CBS_ROLE')
+const SWAP_CBS_TO_CB_ROLE = ethers.utils.id('SWAP_CBS_TO_CB_ROLE')
+
 describe('TokenSwap', function () {
-  let signer: any
+  let admin: SignerWithAddress
+  let accountOne: SignerWithAddress
   let CBToken: any
   let cbToken: any
   let cbsToken: any
@@ -28,20 +32,23 @@ describe('TokenSwap', function () {
   let cbTokenTotalSupply: any
 
   before(async () => {
-    signer = (await hre.ethers.getSigners())[0]
+    ;[admin, accountOne] = await ethers.getSigners()
     CBToken = await ethers.getContractFactory('CBToken')
-    CBSToken = await ethers.getContractFactory('ERC1400')
+    CBSToken = await ethers.getContractFactory('CBSToken')
     TokenSwap = await ethers.getContractFactory('TokenSwap')
 
     cbToken = await CBToken.deploy('CBToken', 'CBT', DECIMALS)
     await cbToken.deployed()
 
+    const { chainId } = await ethers.provider.getNetwork()
+
     cbsToken = await CBSToken.deploy(
       'CBSToken',
       'CBST',
       DECIMALS,
-      [signer.address],
-      defaultPartitions
+      [admin.address],
+      defaultPartitions,
+      chainId
     )
     await cbsToken.deployed()
 
@@ -50,7 +57,7 @@ describe('TokenSwap', function () {
       'CB token total supply',
       ethers.utils.formatUnits(cbTokenTotalSupply, DECIMALS)
     )
-    expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply)
+    expect(await cbToken.balanceOf(admin.address)).to.equal(cbTokenTotalSupply)
 
     const cbsTokenTotalSupply = await cbsToken.totalSupply()
     debug(
@@ -58,7 +65,7 @@ describe('TokenSwap', function () {
       ethers.utils.formatUnits(cbsTokenTotalSupply, DECIMALS)
     )
     expect(cbsTokenTotalSupply).to.equal(ethers.constants.Zero)
-    expect(await cbsToken.balanceOf(signer.address)).to.equal(
+    expect(await cbsToken.balanceOf(admin.address)).to.equal(
       ethers.constants.Zero
     )
   })
@@ -80,25 +87,63 @@ describe('TokenSwap', function () {
     await cbsToken.authorizeOperatorByPartition(PARTITION_2, tokenSwap.address)
   })
 
-  it('should transfer CB tokens to the swap contract and issue CBS tokens', async () => {
-    await tokenSwap.swapCbToCbs(PARTITION_2, value, ethers.constants.HashZero)
+  describe('#swapCbToCbs()', () => {
+    it('should allow accounts with the SWAP_CB_TO_CBS_ROLE to swap from CB to CBS', async () => {
+      expect(
+        await tokenSwap.hasRole(SWAP_CB_TO_CBS_ROLE, admin.address)
+      ).to.equal(true)
 
-    expect(await cbToken.balanceOf(signer.address)).to.equal(
-      cbTokenTotalSupply.sub(value)
-    )
-    expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(value)
-    expect(await cbsToken.balanceOf(signer.address)).to.equal(value)
+      await tokenSwap.swapCbToCbs(PARTITION_2, value, ethers.constants.HashZero)
+
+      expect(await cbToken.balanceOf(admin.address)).to.equal(
+        cbTokenTotalSupply.sub(value)
+      )
+      expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(value)
+      expect(await cbsToken.balanceOf(admin.address)).to.equal(value)
+    })
+
+    it('should not allow other accounts to swap from CB to CBS', async () => {
+      expect(
+        await tokenSwap.hasRole(SWAP_CB_TO_CBS_ROLE, accountOne.address)
+      ).to.equal(false)
+
+      await expect(
+        tokenSwap
+          .connect(accountOne)
+          .swapCbToCbs(PARTITION_2, value, ethers.constants.HashZero)
+      ).to.be.revertedWith('AccessControl')
+    })
   })
 
-  it('should redeem CBS tokens and transfer CB tokens to msg.sender', async () => {
-    await tokenSwap.swapCbsToCb(PARTITION_2, value, ethers.constants.HashZero)
+  describe('#swapCbsToCb()', () => {
+    it('should allow accounts with the SWAP_CBS_TO_CB_ROLE to swap from CBS to CB', async () => {
+      expect(
+        await tokenSwap.hasRole(SWAP_CBS_TO_CB_ROLE, admin.address)
+      ).to.equal(true)
 
-    expect(await cbToken.balanceOf(signer.address)).to.equal(cbTokenTotalSupply)
-    expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(
-      ethers.constants.Zero
-    )
-    expect(await cbsToken.balanceOf(signer.address)).to.equal(
-      ethers.constants.Zero
-    )
+      await tokenSwap.swapCbsToCb(PARTITION_2, value, ethers.constants.HashZero)
+
+      expect(await cbToken.balanceOf(admin.address)).to.equal(
+        cbTokenTotalSupply
+      )
+      expect(await cbToken.balanceOf(tokenSwap.address)).to.equal(
+        ethers.constants.Zero
+      )
+      expect(await cbsToken.balanceOf(admin.address)).to.equal(
+        ethers.constants.Zero
+      )
+    })
+
+    it('should not allow other accounts to swap from CBS to CB', async () => {
+      expect(
+        await tokenSwap.hasRole(SWAP_CBS_TO_CB_ROLE, accountOne.address)
+      ).to.equal(false)
+
+      await expect(
+        tokenSwap
+          .connect(accountOne)
+          .swapCbsToCb(PARTITION_2, value, ethers.constants.HashZero)
+      ).to.be.revertedWith('AccessControl')
+    })
   })
 })

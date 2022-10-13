@@ -14,11 +14,13 @@ contract CBToken is ERC20, AccessControl {
         string memory symbol_,
         uint8 decimals_
     ) ERC20(name_, symbol_) {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, msg.sender);
-        _grantRole(BURNER_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
+        _setupRole(BURNER_ROLE, msg.sender);
+        _setRoleAdmin(MINTER_ROLE, DEFAULT_ADMIN_ROLE);
+        _setRoleAdmin(BURNER_ROLE, DEFAULT_ADMIN_ROLE);
         _decimals = decimals_;
-        _mint(msg.sender, 1_000_000 * (10**decimals()));
+        _mint(msg.sender, 1_000_000 * (10 ** decimals()));
     }
 
     function decimals() public view virtual override returns (uint8) {
